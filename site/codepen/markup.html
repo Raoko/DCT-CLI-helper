@@ -1,0 +1,1009 @@
+<!-- PASSWORD GATE -->
+<div id="pw-gate">
+  <div class="gate-box">
+    <h2>CW Node Helper</h2>
+    <p>Internal documentation — enter password to continue</p>
+    <input type="password" id="pw-input" placeholder="password" autofocus
+           onkeydown="if(event.key==='Enter'){checkPw()}">
+    <div class="gate-err" id="pw-err">Incorrect password</div>
+  </div>
+</div>
+
+<div id="app-content">
+
+<nav id="nav" aria-label="Main navigation">
+  <div class="wrap">
+    <div class="nav-brand"><span>cw</span>-node-helper</div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#integrations">Integrations</a></li>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#guide">Guide</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ============================================================== -->
+<!--  HERO                                                          -->
+<!-- ============================================================== -->
+<section class="hero">
+  <div class="glow glow-amber"></div>
+  <div class="glow glow-blue"></div>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="hero-label">CoreWeave DCT</div>
+        <h1>Your terminal.<br>Your tickets.<br><span class="hl">Zero context switching.</span></h1>
+        <p class="hero-sub">A single-file Python CLI that puts Jira tickets, NetBox data, rack maps, SLA tracking, and live queue monitoring in one place &mdash; your terminal.</p>
+        <a href="#setup" class="hero-cta">Get Started</a>
+        <a href="#features" class="hero-cta-secondary">See Features</a>
+      </div>
+
+      <div class="terminal reveal reveal-delay-1">
+        <div class="terminal-chrome" aria-hidden="true">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <div class="terminal-title">get_node_context.py &mdash; zsh</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-cyan t-bold">  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="t-cyan t-bold">  ┃</span>  <span class="t-white t-bold">CoreWeave  DCT  Node  Helper</span>         <span class="t-cyan t-bold">┃</span>
+<span class="t-cyan t-bold">  ┃</span>  <span class="t-green t-bold">Ricardo Patino</span>  <span class="t-dim">logged in</span>             <span class="t-cyan t-bold">┃</span>
+<span class="t-cyan t-bold">  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+  <span class="t-green t-bold">[WATCHING]</span> <span class="t-dim">DO @ US-CENTRAL-07A — every 45s</span>
+
+  <span class="t-bold">1</span>  Lookup ticket     <span class="t-dim">(DO-12345, HO-67890)</span>
+  <span class="t-bold">2</span>  Node info         <span class="t-dim">(service tag or hostname)</span>
+  <span class="t-bold">3</span>  Browse queue      <span class="t-dim">(DO or HO, by site + status)</span>
+  <span class="t-bold">4</span>  My tickets        <span class="t-dim">(assigned to you)</span>
+  <span class="t-bold">5</span>  Stop watching     <span class="t-dim">(background watcher is running)</span>
+  <span class="t-bold">6</span>  Rack map          <span class="t-dim">(visual location in data hall)</span>
+  <span class="t-bold">7</span>  Bookmarks         <span class="t-dim">(manage saved shortcuts)</span>
+
+  <span class="t-bold">v</span>  Stale verifications <span class="t-dim">(>48h in Verification)</span>
+  <span class="t-bold">q</span>  Quit              <span class="t-bold">?</span>  Help / Quick Guide
+
+  <span class="t-dim">Shortcuts</span>
+    <span class="t-bold">a</span>  All my tickets
+    <span class="t-bold">b</span>  The Elks Open queue
+    <span class="t-bold">c</span>  My Verification tickets
+
+  Select [1-7][a-c], ticket key, or q: <span class="cursor" aria-hidden="true"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!--  PITCH BAR                                                     -->
+<!-- ============================================================== -->
+<div class="pitch-bar">
+  <div class="wrap">
+    <p class="pitch-statement reveal">
+      <span class="pitch-accent">One Python file.</span> <strong>7,000+ lines.</strong> Every system your shift touches &mdash; Jira, NetBox, Grafana, InfiniBand, Teleport &mdash; pulled into <strong>one terminal</strong> with <strong>25+ hotkeys</strong> and zero page loads.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!--  THE PROBLEM                                                   -->
+<!-- ============================================================== -->
+<section class="problem">
+  <div class="wrap">
+    <div class="problem-text reveal">
+      <div class="problem-label">Without this</div>
+      <h2>Five tabs. Three logins. Copy-paste the service tag. Scroll for the rack. Forget which ticket was which.</h2>
+      <ul class="problem-list">
+        <li>Jira open in one tab, NetBox in another, Grafana in a third</li>
+        <li>Copy the service tag from Jira, paste it into NetBox, find the rack</li>
+        <li>Switch back to Jira, scroll down for the SLA, check the linked HO</li>
+        <li>New ticket lands &mdash; you don't see it until someone pings you</li>
+      </ul>
+      <div class="problem-then">Now close all those tabs.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!--  FEATURES                                                      -->
+<!-- ============================================================== -->
+<div id="features">
+
+<!-- FEATURE 1 — TICKET DETAIL -->
+<section class="feature">
+  <div class="wrap">
+    <div class="feature-grid reveal">
+      <div class="feature-text">
+        <div class="feature-num">01 &mdash; Lookup</div>
+        <h2>Everything about a node. One screen.</h2>
+        <p>Type a ticket key, service tag, or hostname. Get the full picture: Jira status, rack location, NetBox hardware, linked RMA tickets, and live SLA timers &mdash; all rendered in your terminal.</p>
+        <div class="feature-tag">Jira + NetBox enrichment</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+            <div class="terminal-title">DO-18739</div>
+          </div>
+          <div class="terminal-body">
+<span class="t-yellow t-bold">  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="t-yellow">  ●</span>  <span class="t-white t-bold">DO-18739</span>    <span class="t-yellow t-bold">IN PROGRESS</span>  <span class="t-dim">(g73d28c)</span>
+<span class="t-dim">     Node CPU thermal fault — replace thermal paste</span>
+<span class="t-yellow t-bold">  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+  <span class="t-green">In In Progress for 3h 22m</span>
+
+  <span class="t-bold">Project</span>  DO  <span class="t-dim">│</span>  <span class="t-bold">Type</span>  Task  <span class="t-dim">│</span>  <span class="t-bold">Assignee</span>  <span class="t-mag t-bold">Ricardo Patino</span>
+  <span class="t-dim">──────────────────────────────────────────────────────────</span>
+          Site   <span class="t-cyan">US-CENTRAL-07A</span>
+          Rack   <span class="t-cyan">US-EVI01.DH1.R64.RU34</span>
+   Service Tag   <span class="t-cyan">10NQ724</span>
+      Hostname   <span class="t-cyan">dh1-r064-ru34-node-01-us-central-07a</span>
+        Vendor   <span class="t-cyan">Dell</span>
+            IP   <span class="t-cyan">10.96.0.42</span>
+  <span class="t-dim">──────────────────────────────────────────────────────────</span>
+  HO Context  <span class="t-mag">●</span> <span class="t-white t-bold">HO-5678</span>  <span class="t-mag t-bold">ON HOLD</span>
+  <span class="t-dim">Full RMA for node g73d28c - thermal + GPU issues</span>
+  <span class="t-mag">RMA flow in progress — vendor handling parts.</span>
+  <span class="t-dim">──────────────────────────────────────────────────────────</span>
+  SLA
+    <span class="t-green">●</span> <span class="t-green t-bold">2h 15m</span>  Time to Resolution  <span class="t-dim">remaining</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 2 — ACTION PANEL -->
+<section class="feature">
+  <div class="wrap">
+    <div class="feature-grid reverse reveal">
+      <div class="feature-text">
+        <div class="feature-num">02 &mdash; Actions</div>
+        <h2>One key does everything.</h2>
+        <p>No menus, no clicks, no page loads. Press a single key to transition status, grab a ticket, post a comment, open Grafana, trace cables, or view the rack &mdash; all without leaving the terminal.</p>
+        <div class="feature-tag">25+ hotkeys</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+            <div class="terminal-title">action panel</div>
+          </div>
+          <div class="terminal-body">
+  <span class="t-dim">──────────────────────────────────────────────────────</span>
+
+  <span class="t-dim">View</span>
+    <span class="t-cyan">[r]</span> <span class="t-white">Rack Map</span>   <span class="t-mag">[n]</span> <span class="t-white">Connections</span>   <span class="t-white">[w]</span> <span class="t-white">Description</span>
+    <span class="t-green">[c]</span> <span class="t-white">Comments (3)</span>   <span class="t-yellow">[e]</span> <span class="t-white">Rack View</span>   <span class="t-red">[u]</span> <span class="t-white">SLA</span>
+
+  <span class="t-dim">Actions</span>
+    <span class="t-green">[a]</span> <span class="t-white">Grab (assign to me)</span>   <span class="t-yellow">[*]</span> <span class="t-white">Bookmark</span>
+
+  <span class="t-dim">Status</span>
+    <span class="t-green">[s]</span> <span class="t-white">Start Work</span>   <span class="t-blue">[v]</span> <span class="t-white">Verification</span>   <span class="t-yellow">[y]</span> <span class="t-white">On Hold</span>
+
+  <span class="t-dim">Open</span>
+    <span class="t-cyan">[j]</span> <span class="t-white">Jira</span>   <span class="t-yellow">[x]</span> <span class="t-white">NetBox</span>   <span class="t-green">[g]</span> <span class="t-white">Grafana</span>
+    <span class="t-green">[i]</span> <span class="t-white">IB</span>   <span class="t-mag">[t]</span> <span class="t-white">Remote Console</span>   <span class="t-mag">[o]</span> <span class="t-white">HO-5678</span>
+
+  <span class="t-dim">Nav</span>  <span class="t-dim">[b]</span> <span class="t-dim">Back</span>   <span class="t-dim">[m]</span> <span class="t-dim">Menu</span>   <span class="t-dim">[h]</span> <span class="t-dim">History</span>   <span class="t-dim">[q]</span> <span class="t-dim">Quit</span>   <span class="t-cyan">[?]</span> <span class="t-dim">Help</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 3 — QUEUE BROWSER -->
+<section class="feature">
+  <div class="wrap">
+    <div class="feature-grid reveal">
+      <div class="feature-text">
+        <div class="feature-num">03 &mdash; Queue</div>
+        <h2>Browse. Filter. Grab.</h2>
+        <p>See every open ticket for your site at a glance. Filter by status, sort by age, and grab unassigned tickets instantly. Color-coded status and SLA age tell you what needs attention first.</p>
+        <div class="feature-tag">Site + status filtering</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+            <div class="terminal-title">queue &mdash; US-CENTRAL-07A</div>
+          </div>
+          <div class="terminal-body">
+  <span class="t-white t-bold">DO queue for US-CENTRAL-07A</span>  <span class="t-dim">(top 20)</span>  <span class="t-dim">filter:</span> <span class="t-yellow t-bold">open</span>
+
+   <span class="t-bold">1.</span>  DO-18739  <span class="t-yellow">●</span> <span class="t-yellow">In Progress</span>      <span class="t-green">3h 22m</span>  <span class="t-cyan">10NQ724</span>          <span class="t-dim">Ricardo</span>
+   <span class="t-bold">2.</span>  DO-18740  <span class="t-dim">○</span> <span class="t-dim">To Do</span>            <span class="t-green">1h 05m</span>  <span class="t-cyan">ABCD1234</span>
+   <span class="t-bold">3.</span>  DO-18741  <span class="t-blue">●</span> <span class="t-blue">Verification</span>     <span class="t-yellow">2d 4h</span>   <span class="t-cyan">7KLP982</span>          <span class="t-dim">Maria</span>
+   <span class="t-bold">4.</span>  DO-18742  <span class="t-mag">○</span> <span class="t-mag">On Hold</span>          <span class="t-yellow">1d 8h</span>   <span class="t-cyan">XYZ9876</span>          <span class="t-dim">Jane</span>
+   <span class="t-bold">5.</span>  DO-18743  <span class="t-dim">○</span> <span class="t-dim">To Do</span>            <span class="t-green">45m</span>     <span class="t-cyan">QW3RT1Y</span>
+   <span class="t-bold">6.</span>  DO-18744  <span class="t-yellow">●</span> <span class="t-yellow">In Progress</span>      <span class="t-red">5d 2h</span>   <span class="t-cyan">PLM8821</span>          <span class="t-dim">Ahmed</span>
+   <span class="t-bold">7.</span>  DO-18745  <span class="t-blue">●</span> <span class="t-blue">Verification</span>     <span class="t-green">18h</span>     <span class="t-cyan">NR44K19</span>          <span class="t-dim">Ricardo</span>
+   <span class="t-bold">8.</span>  DO-18746  <span class="t-dim">○</span> <span class="t-dim">To Do</span>            <span class="t-green">12m</span>     <span class="t-cyan">WW7XP02</span>
+
+  Type a number (1-8), * bookmark this queue, or ENTER to go back: <span class="cursor" aria-hidden="true"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 4 — DATA HALL MAP + RACK ELEVATION (wide, side-by-side) -->
+<section class="feature-wide" id="map">
+  <div class="wrap">
+    <div class="feature-wide-header reveal">
+      <div>
+        <div class="feature-num">04 &mdash; Navigate</div>
+        <h2>Find any rack in the building.</h2>
+      </div>
+      <p>The data hall map shows your target rack with a walking route from the entrance. The rack elevation shows every device in the cabinet, with drill-in to adjacent racks.</p>
+    </div>
+    <div class="dual-terminal reveal reveal-delay-1">
+      <div class="terminal">
+        <div class="terminal-chrome" aria-hidden="true">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <div class="terminal-title">data hall map</div>
+        </div>
+        <div class="terminal-body"><span class="t-white t-bold">US-EVI01 DH1</span> <span class="t-dim">— Rack R64</span>
+<span class="t-dim">Left (R1-R140)      Right (R141-R320)</span>
+
+<span class="map-rack">----------</span>      <span class="map-rack">----------</span>
+<span class="map-rack">----------</span>      <span class="map-rack">----------</span>
+
+<span class="map-rack">----------</span>      <span class="map-rack">----------</span>
+<span class="map-rack">----------</span>      <span class="map-rack">----------</span>
+
+<span class="map-rack">----------</span>      <span class="map-rack">----------</span>
+<span class="map-rack">----------</span>      <span class="map-rack">----------</span>
+
+<span class="map-rack">---</span><span class="map-target">#</span><span class="map-rack">------</span><span class="map-route">==+</span>   <span class="map-rack">----------</span>
+             <span class="map-route">|</span>
+<span class="map-rack">----------</span>   <span class="map-route">|</span>   <span class="map-rack">----------</span>
+<span class="map-rack">----------</span>   <span class="map-route">|</span>   <span class="map-rack">----------</span>
+             <span class="map-route">|</span>
+<span class="map-rack">----------</span>   <span class="map-route">|</span>   <span class="map-rack">----------</span>
+             <span class="map-route">=================</span>
+
+<span class="map-target">#</span> = R64 (LEFT column)  <span class="map-route">===</span> walking route</div>
+      </div>
+      <div class="terminal">
+        <div class="terminal-chrome" aria-hidden="true">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <div class="terminal-title">rack elevation</div>
+        </div>
+        <div class="terminal-body">
+  <span class="t-white t-bold">064</span>  <span class="t-dim">US-CENTRAL-07A</span>  <span class="t-dim">42U</span>
+  <span class="t-dim">┌──────────────────────────────────────────┐</span>
+  <span class="t-dim">│ U42  ...  (empty U42-U36)</span>
+  <span class="t-dim">│</span> <span class="t-dim">U35</span>    PDU A           <span class="t-dim">Infrastructure</span>  <span class="t-green">Active</span>
+  <span class="t-dim">│</span> <span class="t-dim">U34</span>    PDU B           <span class="t-dim">Infrastructure</span>  <span class="t-green">Active</span>
+  <span class="t-dim">│ U33</span>
+  <span class="t-dim">│ U32</span>
+  <span class="t-dim">│</span> <span class="t-dim">U30</span>    BMC             <span class="t-dim">Management</span>      <span class="t-green">Active</span>
+  <span class="t-dim">│</span> <span class="t-dim">U29    ┆</span>
+  <span class="t-dim">│</span> <span class="t-cyan">U27</span>  <span class="t-cyan t-bold">&gt;&gt; Node 1</span>        <span class="t-dim">Server</span>          <span class="t-green">Active</span>
+  <span class="t-dim">│</span> <span class="t-cyan">U26</span>    <span class="t-cyan">┆┆</span>
+  <span class="t-dim">│ U25</span>
+  <span class="t-dim">│</span> <span class="t-dim">U20</span>    TOR A1          <span class="t-dim">Network</span>         <span class="t-green">Active</span>
+  <span class="t-dim">│</span> <span class="t-dim">U18</span>    TOR A2          <span class="t-dim">Network</span>         <span class="t-green">Active</span>
+  <span class="t-dim">│ U17  ...  (empty U17-U01)</span>
+  <span class="t-dim">└──────────────────────────────────────────┘</span>
+  <span class="t-dim">8 devices  │  28/42U occupied</span>
+  <span class="t-cyan t-bold">&gt;&gt;</span> = <span class="t-cyan">dh1-r064-node-01-us-central-07a</span> <span class="t-dim">at U27-U28</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 5 — CONNECTIONS -->
+<section class="feature">
+  <div class="wrap">
+    <div class="feature-grid reveal">
+      <div class="feature-text">
+        <div class="feature-num">05 &mdash; Connections</div>
+        <h2>Trace every cable.</h2>
+        <p>See exactly which port connects to which switch, organized by role: BMC, DPU, InfiniBand, NIC. Type a number to open the cable record directly in NetBox.</p>
+        <div class="feature-tag">NetBox cable tracing</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal terminal--bare accent-cyan">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+            <div class="terminal-title">connections &mdash; 10NQ724</div>
+          </div>
+          <div class="terminal-body">
+  <span class="t-white t-bold">Connections</span>
+  <span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+  <span class="t-yellow t-bold">BMC</span>  <span class="t-dim">(management)</span>
+    <span class="t-bold">1.</span>  bmc        <span class="t-dim">→</span>  <span class="t-bold">TOR A2 01</span>  <span class="t-dim">(R62)</span>  <span class="t-dim">Gi0/1</span>
+
+  <span class="t-mag t-bold">DPU</span>  <span class="t-dim">(data fabric)</span>
+    <span class="t-bold">2.</span>  p0         <span class="t-dim">100G</span>  <span class="t-dim">→</span>  <span class="t-bold">Spine 01</span>  <span class="t-dim">(R100)</span>  <span class="t-dim">et1-1</span>
+
+  <span class="t-green t-bold">IB</span>  <span class="t-dim">(InfiniBand)</span>
+    <span class="t-bold">3.</span>  ib0        <span class="t-dim">100G</span>  <span class="t-dim">→</span>  <span class="t-bold">IB SW A</span>   <span class="t-dim">(R60)</span>   <span class="t-dim">port3</span>
+
+  <span class="t-cyan t-bold">NIC</span>  <span class="t-dim">(network)</span>
+    <span class="t-bold">4.</span>  eno1       <span class="t-dim">10G</span>   <span class="t-dim">→</span>  <span class="t-bold">TOR A1</span>    <span class="t-dim">(R62)</span>   <span class="t-dim">Gi0/2</span>
+
+  <span class="t-dim">4 connections  │  Type # to open cable in NetBox</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 6 — LIVE WATCHER (full-bleed rhythm break) -->
+<section class="feature feature-bleed">
+  <div class="wrap">
+    <div class="feature-grid reverse reveal">
+      <div class="feature-text">
+        <div class="feature-num">06 &mdash; Watcher</div>
+        <h2>New tickets come to you.</h2>
+        <p>The background watcher polls your site queue and pops a notification with sound when new tickets land. Grab them instantly from the card &mdash; or keep working and let them queue up.</p>
+        <div class="feature-tag">macOS notifications + sound</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+            <div class="terminal-title">watcher &mdash; live</div>
+          </div>
+          <div class="terminal-body">
+  <span class="t-white t-bold">Watching DO queue for US-CENTRAL-07A</span>
+  <span class="t-dim">Checking every 45s — Ctrl+C to stop</span>
+  <span class="t-dim">──────────────────────────────────────────────────────</span>
+
+  <span class="t-dim">[14:32] Initial state: 12 open tickets</span>
+  <span class="t-green t-bold">NEW</span>  <span class="t-dim">[14:35]</span>  DO-18750  <span class="t-dim">○</span> <span class="t-dim">To Do</span>  <span class="t-cyan">10NQ724</span>  <span class="t-dim">Node reseat thermal alert</span>
+  <span class="t-dim">[14:40] No changes — 12 open tickets</span>
+  <span class="t-green t-bold">NEW</span>  <span class="t-dim">[14:42]</span>  DO-18751  <span class="t-dim">○</span> <span class="t-dim">To Do</span>  <span class="t-cyan">QW3RT1Y</span>  <span class="t-dim">GPU RMA — fan failure</span>
+
+  <span class="t-green t-bold">┌─ NEW TICKET ──────────────────────────────────────┐</span>
+  <span class="t-green t-bold">│</span>  <span class="t-white t-bold">DO-18751</span>  <span class="t-dim">○</span> <span class="t-dim">To Do</span>   <span class="t-cyan">QW3RT1Y</span>  <span class="t-dim">US-EVI01.DH1.R88.RU20</span>
+  <span class="t-green t-bold">│</span>  <span class="t-dim">GPU RMA — fan failure detected</span>
+  <span class="t-green t-bold">│</span>  <span class="t-dim">Unassigned</span>
+  <span class="t-green t-bold">│</span>
+  <span class="t-green t-bold">│</span>  <span class="t-green">[g]</span> <span class="t-white">Grab</span>   <span class="t-cyan">[v]</span> <span class="t-white">View details</span>   <span class="t-dim">[s]</span> <span class="t-dim">Skip</span>
+  <span class="t-green t-bold">└───────────────────────────────────────────────────┘</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 7 — SLA INTELLIGENCE -->
+<section class="feature">
+  <div class="wrap">
+    <div class="feature-grid reveal">
+      <div class="feature-text">
+        <div class="feature-num">07 &mdash; SLA Intelligence</div>
+        <h2>Know what to do next.</h2>
+        <p>The SLA panel doesn't just show timers &mdash; it gives you personalized guidance based on ticket status, age, and assignment. Stale verifications? It tells you to close. Blocked? It suggests On Hold.</p>
+        <div class="feature-tag">Context-aware guidance</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal terminal--bare accent-green">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+            <div class="terminal-title">SLA &mdash; DO-18739</div>
+          </div>
+          <div class="terminal-body">
+  <span class="t-white t-bold">┃</span> <span class="t-white t-bold">SLA & Ticket Health</span>  <span class="t-dim">DO-18739 — 10NQ724</span>
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  <span class="t-cyan t-bold">●  IN PROGRESS</span>
+  <span class="t-dim">Your SLA is healthy. When your runbook is done:</span>
+
+    <span class="t-green">▸</span> <span class="t-blue">[v]</span> <span class="t-white">Verify</span>  <span class="t-dim">— move to Verification for 24-48h watch</span>
+    <span class="t-yellow">▸</span> <span class="t-yellow">[y]</span> <span class="t-white">Hold</span>    <span class="t-dim">— if waiting on parts/vendor (pauses clock)</span>
+
+  <span class="t-white t-bold">Jira SLA Timers</span>
+
+  <span class="t-green">●</span> <span class="t-green t-bold">OK</span>         Time to Resolution
+               <span class="t-dim">Goal: 4h  │  Remaining:</span> <span class="t-green">2h 15m</span>  <span class="t-dim">│  Elapsed: 1h 45m</span>
+
+  <span class="t-green">✔</span> <span class="t-green t-bold">MET</span>        Time to First Response
+               <span class="t-dim">Goal: 30m  │  Completed in:</span> <span class="t-green">12m</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 8 — STALE VERIFICATION -->
+<section class="feature-wide">
+  <div class="wrap">
+    <div class="feature-wide-header reveal">
+      <div>
+        <div class="feature-num">08 &mdash; Stale Watch</div>
+        <h2>Tickets that need closing.</h2>
+      </div>
+      <p>The stale verification view surfaces tickets sitting in Verification for more than 48 hours. The SLA panel gives you a pre-written closing comment so you can clear the queue in seconds.</p>
+    </div>
+    <div class="dual-terminal reveal reveal-delay-1">
+      <div class="terminal">
+        <div class="terminal-chrome" aria-hidden="true">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <div class="terminal-title">stale verifications</div>
+        </div>
+        <div class="terminal-body">
+  <span class="t-red t-bold">Stale Verification — 4 tickets need action</span>
+  <span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+   <span class="t-bold">1.</span>  DO-18200   <span class="t-red">12d 4h</span>  <span class="t-cyan">PLM8821</span>   <span class="t-dim">GPU recable — no follow-up</span>
+   <span class="t-bold">2.</span>  DO-18355   <span class="t-red"> 7d 2h</span>  <span class="t-cyan">10NQ724</span>   <span class="t-dim">Node reseat — stable</span>
+   <span class="t-bold">3.</span>  DO-18401   <span class="t-yellow"> 3d 8h</span>  <span class="t-cyan">ABCD1234</span>  <span class="t-dim">NVMe swap verification</span>
+   <span class="t-bold">4.</span>  DO-18422   <span class="t-yellow"> 2d 1h</span>  <span class="t-cyan">XYZ9876</span>   <span class="t-dim">Thermal paste reapply</span>
+
+  Type a number (1-4) or ENTER to go back: <span class="cursor" aria-hidden="true"></span></div>
+      </div>
+      <div class="terminal">
+        <div class="terminal-chrome" aria-hidden="true">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <div class="terminal-title">SLA guidance &mdash; stale</div>
+        </div>
+        <div class="terminal-body">
+  <span class="t-red t-bold">⚠  STALE VERIFICATION</span>  <span class="t-dim">(12 days)</span>
+
+  <span class="t-white t-bold">Recommendation:</span> <span class="t-green t-bold">CLOSE THIS TICKET</span>
+
+  <span class="t-dim">What I see on DO-18200:</span>
+    <span class="t-green">▸</span> <span class="t-dim">Last comment was 8d 2h ago</span>
+    <span class="t-dim">▸</span> <span class="t-dim">No linked HO — this DO stands on its own</span>
+    <span class="t-yellow">▸</span> <span class="t-dim">Unassigned — claim with</span> <span class="t-green">[a]</span> <span class="t-dim">first</span>
+
+  <span class="t-dim">Close it:</span>
+    <span class="t-green">▸</span> <span class="t-dim">Press</span> <span class="t-red">[k]</span> <span class="t-dim">to close. Suggested comment:</span>
+  <span class="t-dim">  ┌──────────────────────────────────────────────</span>
+  <span class="t-dim">  │ Work performed: GPU recable per runbook.</span>
+  <span class="t-dim">  │ Current state: LEDs normal; Grafana/IB</span>
+  <span class="t-dim">  │ healthy; no recurring alerts during &gt;12d</span>
+  <span class="t-dim">  │ in Verification. Closing DO per workflow.</span>
+  <span class="t-dim">  └──────────────────────────────────────────────</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 9 — STATUS TRANSITIONS -->
+<section class="feature">
+  <div class="wrap">
+    <div class="feature-grid reverse reveal">
+      <div class="feature-text">
+        <div class="feature-num">09 &mdash; Workflow</div>
+        <h2>Transition tickets without Jira.</h2>
+        <p>Start work, move to verification, put on hold, resume, close &mdash; all from the keyboard. Required comments are prompted inline. The ticket refreshes instantly after each transition.</p>
+        <div class="feature-tag">Fuzzy transition matching</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal terminal--bare accent-blue">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+            <div class="terminal-title">status transitions</div>
+          </div>
+          <div class="terminal-body">
+  <span class="t-dim">Assigning DO-18739 to you...</span>
+  <span class="t-green t-bold">Grabbed DO-18739!</span>
+
+  <span class="t-dim">Starting work on DO-18739...</span>
+  <span class="t-green t-bold">DO-18739 → In Progress</span>
+
+  <span class="t-dim">   ···  (work happens)  ···</span>
+
+  <span class="t-dim">Add a comment (ENTER to skip):</span>
+  &gt; <span class="t-white">Reseated NVMe, POST normal, monitoring 24h.</span>
+
+  <span class="t-dim">Moving DO-18739 to Verification...</span>
+  <span class="t-blue t-bold">DO-18739 → Verification</span>
+
+  <span class="t-dim">   ···  (24-48h later)  ···</span>
+
+  <span class="t-red t-bold">Closing DO-18739</span>
+  &gt; <span class="t-white">Work complete. No recurrence during verification.</span>
+
+  <span class="t-dim">Close DO-18739? [y/n]:</span> <span class="t-white">y</span>
+
+  <span class="t-dim">Closing DO-18739...</span>
+  <span class="t-green t-bold">DO-18739 → Closed</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!--  10 — IB CONNECTIONS                                           -->
+<!-- ============================================================== -->
+<section class="feature">
+  <div class="wrap">
+    <div class="feature-grid reveal">
+      <div class="feature-text">
+        <div class="feature-num">10 &mdash; IB Fabric</div>
+        <h2>Know every IB port.</h2>
+        <p>InfiniBand connections from the cutsheet &mdash; ibp0 through ibp7, each mapped to its leaf switch and port. Works for EVI01 DH1/DH2 and CDZ01. No NetBox dependency. Merged with BMC/DPU connections from NetBox in one view.</p>
+        <div class="feature-tag">Cutsheet + NetBox merged</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+          </div>
+          <div class="terminal-body"><span class="t-bold">Connections</span>
+  <span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+  <span class="t-yellow t-bold">BMC</span>  <span class="t-dim">(management)</span>
+    <span class="t-bold">1.</span>  bmc        <span class="t-dim">1G</span>    <span class="t-dim">→</span>  <span class="t-bold">Infra C2 01</span> <span class="t-dim">(R293)</span>  <span class="t-dim">swp17</span>
+
+  <span class="t-magenta t-bold">DPU</span>  <span class="t-dim">(data fabric)</span>
+    <span class="t-bold">2.</span>  dpup0      <span class="t-dim">400G</span>  <span class="t-dim">→</span>  <span class="t-bold">T0 C2 01</span> <span class="t-dim">(R281)</span>  <span class="t-dim">swp10s3</span>
+
+  <span class="t-green t-bold">IB</span>  <span class="t-dim">(from cutsheet &mdash; 8 ports)</span>
+    <span class="t-dim">○</span>  ibp0   <span class="t-dim">400G</span>  <span class="t-dim">→</span>  <span class="t-bold">Leaf 1.3</span> <span class="t-dim">(R300)</span>  <span class="t-dim">port 4/2</span>
+    <span class="t-dim">○</span>  ibp1   <span class="t-dim">400G</span>  <span class="t-dim">→</span>  <span class="t-bold">Leaf 1.2</span> <span class="t-dim">(R300)</span>  <span class="t-dim">port 4/2</span>
+    <span class="t-dim">○</span>  ibp2   <span class="t-dim">400G</span>  <span class="t-dim">→</span>  <span class="t-bold">Leaf 1.4</span> <span class="t-dim">(R300)</span>  <span class="t-dim">port 4/2</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!--  11 — RACK NEIGHBORS & CAB NAV                                 -->
+<!-- ============================================================== -->
+<section class="feature">
+  <div class="wrap">
+    <div class="feature-grid reverse reveal">
+      <div class="feature-text">
+        <div class="feature-num">11 &mdash; Rack Neighbors</div>
+        <h2>See what's next door. Jump anywhere.</h2>
+        <p>From any rack elevation, view the cabinets to the left and right with all their devices. Navigate with <kbd>L1</kbd>/<kbd>R1</kbd> to drill into neighbor nodes, <kbd>&lt;</kbd>/<kbd>&gt;</kbd> to walk the row, or type any cab number to jump directly. CDU racks show their adjacent GPU cabinets.</p>
+        <div class="feature-tag">Adjacent racks + cab# navigation</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+          </div>
+          <div class="terminal-body"><span class="t-bold">9 devices</span> <span class="t-dim">loaded</span>  <span class="t-dim">&mdash;</span>  <span class="t-cyan t-bold">d</span> <span class="t-dim">to drill into a device</span>
+
+<span class="t-dim">&mdash;&mdash; Adjacent Racks &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</span>
+
+  <span class="t-bold">&lt;&lt;</span> <span class="t-bold">R63</span>  <span class="t-dim">(9 devices)</span>                  <span class="t-bold">R65</span>  <span class="t-dim">(9 devices)</span> <span class="t-bold">&gt;&gt;</span>
+
+   <span class="t-bold">L1.</span> U34  Node 1     <span class="t-green">Active</span>     <span class="t-bold">R1.</span> U34  Node 1     <span class="t-green">Active</span>
+   <span class="t-bold">L2.</span> U30  Node 2     <span class="t-green">Active</span>     <span class="t-bold">R2.</span> U30  Node 2     <span class="t-green">Active</span>
+   <span class="t-bold">L3.</span> U26  Node 3     <span class="t-red">Failed</span>     <span class="t-bold">R3.</span> U26  Node 3     <span class="t-green">Active</span>
+
+  <span class="t-cyan t-bold">d</span> <span class="t-dim">drill into device</span> <span class="t-dim">|</span> <span class="t-yellow t-bold">L1</span><span class="t-dim">-</span><span class="t-yellow t-bold">L9</span> <span class="t-dim">left</span> <span class="t-dim">|</span> <span class="t-magenta t-bold">&lt;</span> <span class="t-dim">move left</span> <span class="t-dim">|</span> <span class="t-dim t-bold">#</span> <span class="t-dim">go to cab</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!--  12 — WEEKEND AUTO-ASSIGNMENT                                  -->
+<!-- ============================================================== -->
+<section class="feature feature-bleed">
+  <div class="wrap">
+    <div class="feature-grid reveal">
+      <div class="feature-text">
+        <div class="feature-num">12 &mdash; Weekend Auto-Assign</div>
+        <h2>No ticket sits idle on weekends.</h2>
+        <p>Round-robin auto-assignment pulls your Jira group roster and distributes unassigned tickets evenly across the team. Run it from cron every 30 minutes or let the watcher handle it live. Rotation state persists across restarts.</p>
+        <div class="feature-tag">Cron + watcher &middot; round-robin</div>
+      </div>
+      <div class="feature-visual">
+        <div class="terminal">
+          <div class="terminal-chrome" aria-hidden="true">
+            <div class="terminal-dot r"></div>
+            <div class="terminal-dot y"></div>
+            <div class="terminal-dot g"></div>
+            <div class="terminal-title">weekend-assign &mdash; US-CENTRAL-07A</div>
+          </div>
+          <div class="terminal-body">
+  <span class="t-dim">$ python3 get_node_context.py weekend-assign \</span>
+  <span class="t-dim">    --site US-CENTRAL-07A --group dct-ops</span>
+
+  <span class="t-dim">Fetching group roster...</span> <span class="t-green t-bold">6 members</span>
+  <span class="t-dim">Fetching open queue...</span>   <span class="t-yellow t-bold">3 unassigned</span>
+
+  <span class="t-green">AUTO</span>  DO-19201  <span class="t-dim">-></span>  <span class="t-white t-bold">Maria Lopez</span>
+  <span class="t-green">AUTO</span>  DO-19203  <span class="t-dim">-></span>  <span class="t-white t-bold">Ahmed Khan</span>
+  <span class="t-green">AUTO</span>  DO-19205  <span class="t-dim">-></span>  <span class="t-white t-bold">Jane Chen</span>
+
+  <span class="t-bold">3 ticket(s) assigned:</span>
+    DO-19201  ->  Maria Lopez   <span class="t-dim">(2026-03-01T14:30)</span>
+    DO-19203  ->  Ahmed Khan    <span class="t-dim">(2026-03-01T14:30)</span>
+    DO-19205  ->  Jane Chen     <span class="t-dim">(2026-03-01T14:30)</span>
+
+  <span class="t-dim">Robin index: 3 -> 6  |  Next up: Ricardo Patino</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- #features -->
+
+<!-- ============================================================== -->
+<!--  INTEGRATIONS                                                  -->
+<!-- ============================================================== -->
+<section class="integrations" id="integrations">
+  <div class="wrap">
+    <h2 class="reveal">Pulls from everywhere.<br>Lives in one place.</h2>
+    <div class="int-flow reveal reveal-delay-1">
+      <div class="int-item"><strong>Jira Cloud</strong></div>
+      <div class="int-item"><strong>NetBox</strong></div>
+      <div class="int-item"><strong>Grafana</strong></div>
+      <div class="int-item"><strong>InfiniBand</strong></div>
+      <div class="int-item"><strong>Teleport</strong></div>
+    </div>
+    <p class="int-sub reveal reveal-delay-2">Tickets, rack positions, cables, dashboards, remote consoles &mdash; one lookup, one screen.</p>
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!--  SETUP                                                         -->
+<!-- ============================================================== -->
+<section class="setup" id="setup">
+  <div class="wrap">
+    <h2 class="reveal">Up and running in 60 seconds.</h2>
+    <div class="setup-steps reveal reveal-delay-1">
+      <div class="setup-step">
+        <div class="setup-step-num">01</div>
+        <h3>Install</h3>
+        <code>pip3 install requests</code>
+        <p>Python 3.10+ and one dependency.</p>
+      </div>
+      <div class="setup-step">
+        <div class="setup-step-num">02</div>
+        <h3>Create .env</h3>
+        <code>cp .env.example .env</code>
+        <p>Copy the template, then edit with your credentials. See ENV_GUIDE.txt for step-by-step instructions.</p>
+      </div>
+      <div class="setup-step">
+        <div class="setup-step-num">03</div>
+        <h3>API Tokens</h3>
+        <code>Jira token (required) + NetBox token (optional)</code>
+        <p>Generate a Jira API token from your Atlassian account settings. NetBox token enables rack views and connections. URLs are in the ENV_GUIDE.txt included in the download.</p>
+      </div>
+      <div class="setup-step">
+        <div class="setup-step-num">04</div>
+        <h3>Run</h3>
+        <code>source load_env.sh && python3 get_node_context.py</code>
+        <p>Type <strong>?</strong> for help. 30+ hotkeys. Press <strong>[?]</strong> inside a ticket for the full reference.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!--  GUIDE                                                         -->
+<!-- ============================================================== -->
+<section class="guide" id="guide">
+  <div class="wrap">
+    <h2 class="reveal">Full Setup &amp; Usage Guide</h2>
+    <p class="guide-sub reveal">Everything you need to go from zero to productive. Click any section to expand.</p>
+
+    <div class="guide-cards reveal reveal-delay-1">
+
+      <!-- CARD 1 — API Keys -->
+      <div class="guide-card">
+        <div class="guide-card-header" onclick="toggleGuide(this)">
+          <h3><span class="guide-card-num">01</span> Getting Your API Keys</h3>
+          <span class="guide-card-chevron">&#9656;</span>
+        </div>
+        <div class="guide-card-body">
+          <div class="guide-card-inner">
+            <h4>Jira API Token <span class="hl-red">(required)</span></h4>
+            <p>This is how the tool authenticates with Jira on your behalf. It takes about 2 minutes.</p>
+            <ol>
+              <li>Open <strong>id.atlassian.com/manage-profile/security/api-tokens</strong> in your browser</li>
+              <li>Click <strong class="hl-accent">"Create API token"</strong></li>
+              <li>Name it something like <span class="hl-cyan">cw-node-helper</span></li>
+              <li>Click <strong>Create</strong> and <strong class="hl-green">copy the token immediately</strong> &mdash; you won't see it again</li>
+            </ol>
+            <div class="guide-warn">Jira tokens are tied to <strong>your</strong> account. Never share them. If compromised, revoke at the same URL and generate a new one.</div>
+
+            <h4>NetBox API Token <span class="hl-cyan">(optional but recommended)</span></h4>
+            <p>NetBox enables rack elevations, cable tracing, device lookups, and neighbor navigation. Without it the tool still works &mdash; you just won't see hardware-level data.</p>
+            <ol>
+              <li>Open <strong>coreweave.cloud.netboxapp.com/user/api-tokens/</strong></li>
+              <li>Click <strong class="hl-accent">"Add a token"</strong></li>
+              <li>Copy the token</li>
+            </ol>
+            <div class="guide-tip">If you don't have NetBox access yet, ask your lead. The tool is fully usable with just Jira &mdash; add NetBox later anytime.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2 — First Run -->
+      <div class="guide-card">
+        <div class="guide-card-header" onclick="toggleGuide(this)">
+          <h3><span class="guide-card-num">02</span> First Run Setup</h3>
+          <span class="guide-card-chevron">&#9656;</span>
+        </div>
+        <div class="guide-card-body">
+          <div class="guide-card-inner">
+            <h4>Prerequisites</h4>
+            <ul>
+              <li><strong>Python 3.10+</strong> &mdash; check with <span class="hl-cyan">python3 --version</span></li>
+              <li><strong>macOS or Linux</strong> terminal (Windows WSL works too)</li>
+            </ul>
+
+            <h4>Step-by-step</h4>
+<div class="guide-code"><span class="hl-accent"># 1. Install the one dependency</span>
+pip3 install requests
+
+<span class="hl-accent"># 2. Copy the env template</span>
+cp .env.example .env
+
+<span class="hl-accent"># 3. Edit with your credentials</span>
+nano .env   <span class="hl-cyan"># or:  code .env  /  open -e .env</span></div>
+
+            <p>Fill in your <span class="hl-cyan">.env</span> file:</p>
+<div class="guide-code">JIRA_EMAIL=<span class="hl-green">your.name@coreweave.com</span>
+JIRA_API_TOKEN=<span class="hl-green">ATATT3xFfGF0abc123def...</span>
+
+<span class="hl-accent"># Optional</span>
+NETBOX_API_URL=https://coreweave.cloud.netboxapp.com/api
+NETBOX_API_TOKEN=<span class="hl-green">your-netbox-token-here</span></div>
+
+            <h4>Launch</h4>
+<div class="guide-code"><span class="hl-accent"># Load env vars + start the app</span>
+source load_env.sh && python3 get_node_context.py</div>
+            <div class="guide-tip">You need to run <strong>source load_env.sh</strong> once per terminal session. It reads your .env and exports the variables. After that, just run <span class="hl-cyan">python3 get_node_context.py</span> to restart.</div>
+
+            <h4>Troubleshooting</h4>
+            <ul>
+              <li><strong class="hl-red">401 Unauthorized</strong> &mdash; double-check JIRA_EMAIL and JIRA_API_TOKEN, no extra spaces</li>
+              <li><strong class="hl-red">No module 'requests'</strong> &mdash; run <span class="hl-cyan">pip3 install requests</span></li>
+              <li><strong class="hl-red">command not found: python3</strong> &mdash; install Python 3.10+ (<span class="hl-cyan">brew install python3</span> on macOS)</li>
+              <li><strong class="hl-yellow">No rack info</strong> &mdash; NetBox token missing or wrong; Jira features still work fine</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3 — CLI Commands -->
+      <div class="guide-card">
+        <div class="guide-card-header" onclick="toggleGuide(this)">
+          <h3><span class="guide-card-num">03</span> CLI Commands &amp; Usage</h3>
+          <span class="guide-card-chevron">&#9656;</span>
+        </div>
+        <div class="guide-card-body">
+          <div class="guide-card-inner">
+            <h4>Interactive Mode (default)</h4>
+            <p>Just launch the app &mdash; you get a menu with numbered options, bookmark shortcuts, and a prompt. Type ticket keys, service tags, or hostnames directly at the menu.</p>
+<div class="guide-code"><span class="hl-accent"># Launch interactive mode</span>
+source load_env.sh && python3 get_node_context.py
+
+<span class="hl-accent"># Menu options:</span>
+  <span class="hl-green">1</span>  Lookup ticket      <span class="hl-cyan">(DO-12345, HO-67890)</span>
+  <span class="hl-green">2</span>  Node info          <span class="hl-cyan">(service tag or hostname)</span>
+  <span class="hl-green">3</span>  Browse queue       <span class="hl-cyan">(DO or HO, by site + status)</span>
+  <span class="hl-green">4</span>  My tickets         <span class="hl-cyan">(assigned to you)</span>
+  <span class="hl-green">5</span>  Watch queue        <span class="hl-cyan">(live polling + notifications)</span>
+  <span class="hl-green">6</span>  Rack map           <span class="hl-cyan">(visual location in data hall)</span>
+  <span class="hl-green">7</span>  Bookmarks          <span class="hl-cyan">(manage saved shortcuts)</span></div>
+
+            <h4>One-Shot Lookups</h4>
+            <p>Skip the menu entirely &mdash; pass a ticket key, service tag, or hostname as an argument:</p>
+<div class="guide-code"><span class="hl-accent"># By ticket key</span>
+python3 get_node_context.py <span class="hl-green">DO-12345</span>
+
+<span class="hl-accent"># By service tag</span>
+python3 get_node_context.py <span class="hl-green">10NQ724</span>
+
+<span class="hl-accent"># By hostname</span>
+python3 get_node_context.py <span class="hl-green">d0001142</span></div>
+
+            <h4>Queue Browsing</h4>
+<div class="guide-code"><span class="hl-accent"># Open tickets at your site</span>
+python3 get_node_context.py queue --site US-CENTRAL-07A --status open
+
+<span class="hl-accent"># HO tickets for a site</span>
+python3 get_node_context.py queue --project HO --site US-EAST-03
+
+<span class="hl-accent"># Just my tickets</span>
+python3 get_node_context.py queue --mine</div>
+
+            <h4>Node History</h4>
+<div class="guide-code"><span class="hl-accent"># All tickets for a service tag</span>
+python3 get_node_context.py history <span class="hl-green">10NQ724</span>
+
+<span class="hl-accent"># All tickets for a hostname</span>
+python3 get_node_context.py history <span class="hl-green">d0001142</span></div>
+
+            <h4>Background Watcher</h4>
+<div class="guide-code"><span class="hl-accent"># Watch for new tickets (macOS notifications + sound)</span>
+python3 get_node_context.py watch --site US-CENTRAL-07A --interval 45</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 4 — Speed Tips -->
+      <div class="guide-card">
+        <div class="guide-card-header" onclick="toggleGuide(this)">
+          <h3><span class="guide-card-num">04</span> Speed Tips &mdash; Make It Faster</h3>
+          <span class="guide-card-chevron">&#9656;</span>
+        </div>
+        <div class="guide-card-body">
+          <div class="guide-card-inner">
+            <h4>Built-in Caching</h4>
+            <p>The tool caches aggressively so repeated lookups are instant:</p>
+            <ul>
+              <li><strong>Issue cache</strong> (100 entries) &mdash; revisiting a ticket doesn't re-fetch</li>
+              <li><strong>JQL cache</strong> (200 entries, 60s TTL) &mdash; queue refreshes are fast</li>
+              <li><strong>NetBox cache</strong> (50 entries) &mdash; device/rack data stays in memory</li>
+              <li><strong>Parallel API calls</strong> &mdash; Jira + NetBox fetched simultaneously</li>
+            </ul>
+
+            <h4>Use Bookmarks</h4>
+            <p>Save your most-used searches to slots <span class="hl-cyan">a</span> through <span class="hl-cyan">e</span>. Access them from the main menu with a single keypress.</p>
+<div class="guide-code"><span class="hl-accent"># Inside a ticket or queue, press:</span>
+  <span class="hl-yellow">[*]</span>  Bookmark this ticket or queue
+
+<span class="hl-accent"># From main menu, press:</span>
+  <span class="hl-green">a</span>  All my tickets
+  <span class="hl-green">b</span>  Your site's open queue
+  <span class="hl-green">c</span>  My Verification tickets</div>
+            <div class="guide-tip">Bookmarks persist across sessions in <span class="hl-cyan">.cwhelper_state.json</span>. Set them once, use them forever.</div>
+
+            <h4>Skip the Menu</h4>
+            <p>Type ticket keys or service tags directly at the main menu prompt &mdash; no need to press <span class="hl-cyan">1</span> first:</p>
+<div class="guide-code"><span class="hl-accent"># At the "Select [1-7]" prompt, just type:</span>
+DO-18739      <span class="hl-cyan">&mdash; goes straight to the ticket</span>
+10NQ724       <span class="hl-cyan">&mdash; looks up by service tag</span>
+d0001142      <span class="hl-cyan">&mdash; looks up by hostname</span></div>
+
+            <h4>Turn Off Animations</h4>
+            <p>The rack map and DH map have animated drawing. If you want instant rendering:</p>
+<div class="guide-code"><span class="hl-accent"># Add to your .env or export manually:</span>
+CWHELPER_ANIMATE=0</div>
+
+            <h4>Install as a Global Command</h4>
+            <p>Skip typing the full path every time:</p>
+<div class="guide-code"><span class="hl-accent"># From the cw-node-helper directory:</span>
+pip3 install -e .
+
+<span class="hl-accent"># Now works from anywhere:</span>
+cwhelper DO-12345</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 5 — Workflow Playbook -->
+      <div class="guide-card">
+        <div class="guide-card-header" onclick="toggleGuide(this)">
+          <h3><span class="guide-card-num">05</span> Workflow Playbook &mdash; Tips &amp; Tricks</h3>
+          <span class="guide-card-chevron">&#9656;</span>
+        </div>
+        <div class="guide-card-body">
+          <div class="guide-card-inner">
+            <h4>The Fastest Ticket Lifecycle</h4>
+            <p>Start-to-close in as few keystrokes as possible:</p>
+<div class="guide-code"><span class="hl-accent"># 1. Grab the ticket</span>
+  <span class="hl-green">[a]</span>  Assign to yourself
+
+<span class="hl-accent"># 2. Start work</span>
+  <span class="hl-green">[s]</span>  Moves ticket to "In Progress"
+
+<span class="hl-accent"># 3. View rack &amp; connections while walking</span>
+  <span class="hl-cyan">[r]</span>  Rack map &mdash; walking route from entrance
+  <span class="hl-cyan">[e]</span>  Rack elevation &mdash; see what's in the cabinet
+  <span class="hl-cyan">[n]</span>  Connections &mdash; which ports go where
+
+<span class="hl-accent"># 4. After the work is done</span>
+  <span class="hl-blue">[v]</span>  Move to Verification (add a comment if prompted)
+
+<span class="hl-accent"># 5. 24-48h later, close it</span>
+  <span class="hl-red">[k]</span>  Close (with closing comment)</div>
+
+            <h4>The Watcher Workflow</h4>
+            <p>Best for shifts where you're waiting for tickets to land:</p>
+            <ol>
+              <li>Start the app and press <span class="hl-cyan">5</span> to start watching your site queue</li>
+              <li>Work on other things &mdash; you'll get a macOS notification with sound when a new ticket arrives</li>
+              <li>A card pops up with <span class="hl-green">[g]</span> Grab, <span class="hl-cyan">[v]</span> View, <span class="hl-cyan">[s]</span> Skip</li>
+              <li>Grab it instantly &mdash; no one beats you to the ticket</li>
+            </ol>
+
+            <h4>Stale Verification Sweep</h4>
+            <p>Press <span class="hl-cyan">v</span> at the main menu to see tickets stuck in Verification for 48+ hours. The SLA panel gives you a pre-written closing comment &mdash; just press <span class="hl-red">[k]</span> and paste.</p>
+            <div class="guide-tip">Do a stale sweep at the start of every shift. It keeps the queue clean and boosts your team's SLA metrics.</div>
+
+            <h4>Quick Checks Before Walking to a Rack</h4>
+            <ol>
+              <li><span class="hl-cyan">[r]</span> &mdash; see exactly where the rack is + walking route</li>
+              <li><span class="hl-cyan">[n]</span> &mdash; check which ports/cables you'll need to touch</li>
+              <li><span class="hl-cyan">[e]</span> &mdash; see what else is in the cabinet (PDUs, switches, other nodes)</li>
+              <li><span class="hl-cyan">[o]</span> &mdash; check the linked HO for vendor/RMA status</li>
+            </ol>
+
+            <h4>Essential Hotkey Reference</h4>
+            <div class="guide-hotkey-grid">
+              <div class="guide-hotkey"><kbd>a</kbd> <span>Grab ticket</span></div>
+              <div class="guide-hotkey"><kbd>s</kbd> <span>Start work</span></div>
+              <div class="guide-hotkey"><kbd>v</kbd> <span>Verify</span></div>
+              <div class="guide-hotkey"><kbd>y</kbd> <span>On Hold</span></div>
+              <div class="guide-hotkey"><kbd>z</kbd> <span>Resume</span></div>
+              <div class="guide-hotkey"><kbd>k</kbd> <span>Close</span></div>
+              <div class="guide-hotkey"><kbd>r</kbd> <span>Rack map</span></div>
+              <div class="guide-hotkey"><kbd>e</kbd> <span>Rack elevation</span></div>
+              <div class="guide-hotkey"><kbd>n</kbd> <span>Connections</span></div>
+              <div class="guide-hotkey"><kbd>c</kbd> <span>Comments</span></div>
+              <div class="guide-hotkey"><kbd>w</kbd> <span>Description</span></div>
+              <div class="guide-hotkey"><kbd>l</kbd> <span>Linked issues</span></div>
+              <div class="guide-hotkey"><kbd>j</kbd> <span>Open Jira</span></div>
+              <div class="guide-hotkey"><kbd>g</kbd> <span>Open Grafana</span></div>
+              <div class="guide-hotkey"><kbd>x</kbd> <span>Open NetBox</span></div>
+              <div class="guide-hotkey"><kbd>t</kbd> <span>Remote console</span></div>
+              <div class="guide-hotkey"><kbd>i</kbd> <span>IB dashboard</span></div>
+              <div class="guide-hotkey"><kbd>o</kbd> <span>Linked HO/DO</span></div>
+              <div class="guide-hotkey"><kbd>h</kbd> <span>Node history</span></div>
+              <div class="guide-hotkey"><kbd>*</kbd> <span>Bookmark</span></div>
+              <div class="guide-hotkey"><kbd>b</kbd> <span>Back</span></div>
+              <div class="guide-hotkey"><kbd>m</kbd> <span>Menu</span></div>
+              <div class="guide-hotkey"><kbd>?</kbd> <span>Help</span></div>
+              <div class="guide-hotkey"><kbd>q</kbd> <span>Quit</span></div>
+            </div>
+
+            <h4>Best Practices</h4>
+            <ul>
+              <li><strong>Always check comments</strong> <span class="hl-cyan">[c]</span> before starting &mdash; someone may have left notes</li>
+              <li><strong>Check the linked HO</strong> <span class="hl-cyan">[o]</span> before closing a DO &mdash; make sure the RMA side is handled</li>
+              <li><strong>Use Hold</strong> <span class="hl-yellow">[y]</span> when waiting on parts/vendor &mdash; it <strong>pauses the SLA clock</strong></li>
+              <li><strong>Verify, don't close immediately</strong> &mdash; 24-48h in Verification catches repeat failures</li>
+              <li><strong>Add comments</strong> when prompted &mdash; future you (or your teammates) will thank you</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .guide-cards -->
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!--  FOOTER                                                        -->
+<!-- ============================================================== -->
+<footer>
+  <div class="wrap">
+    <div class="footer-left">Built by <strong>Ricardo Patino</strong> for CoreWeave DCT<br><span style="color:var(--ansi-yellow);font-size:0.65rem;">Active development &mdash; report bugs to Romeo Patino</span></div>
+    <div class="footer-right">Python 3.10+ &middot; Single file &middot; 7,000+ lines &middot; v7</div>
+  </div>
+</footer>
+
+</div><!-- #app-content -->

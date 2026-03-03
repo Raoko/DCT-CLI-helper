@@ -1,0 +1,103 @@
+How to Set Up Your .env File (Step by Step)
+=============================================
+
+The .env file stores your personal API tokens so the app can
+talk to Jira and NetBox on your behalf. It stays on YOUR machine
+and is never shared or uploaded anywhere.
+
+
+STEP 1 — Copy the template
+---------------------------
+In your terminal, navigate to the cw-node-helper folder and run:
+
+  cp .env.example .env
+
+This creates a file called .env from the template.
+
+
+STEP 2 — Get your Jira API token (REQUIRED)
+--------------------------------------------
+1. Open your browser and go to:
+   https://id.atlassian.com/manage-profile/security/api-tokens
+
+2. Click "Create API token"
+3. Give it a name like "cw-node-helper"
+4. Click "Create"
+5. COPY the token (you won't see it again!)
+
+
+STEP 3 — Edit the .env file
+----------------------------
+Open .env in any text editor:
+
+  nano .env         (terminal editor)
+  code .env         (VS Code)
+  open -e .env      (macOS TextEdit)
+
+Replace the placeholder values:
+
+  JIRA_EMAIL=your.name@coreweave.com
+  JIRA_API_TOKEN=paste_your_token_here
+
+Change "your.name@coreweave.com" to YOUR actual CoreWeave email.
+Paste the token you copied in step 2 where it says "paste_your_token_here".
+
+Example (NOT real values):
+  JIRA_EMAIL=john.doe@coreweave.com
+  JIRA_API_TOKEN=ATATT3xFfGF0abc123def456ghi789...
+
+
+STEP 4 — NetBox token (OPTIONAL but recommended)
+-------------------------------------------------
+NetBox enables rack views, device lookups, and cable connections.
+If you have a NetBox account:
+
+1. Go to: https://coreweave.cloud.netboxapp.com/user/api-tokens/
+2. Click "Add a token"
+3. Copy the token
+
+5. Add to your .env file:
+   NETBOX_API_URL=https://coreweave.cloud.netboxapp.com/api
+   NETBOX_API_TOKEN=paste_your_netbox_token_here
+
+If you don't have NetBox access, just leave these lines as-is.
+The app works fine without NetBox — you just won't see rack
+views or cable connections.
+
+
+STEP 5 — Run the app
+---------------------
+  source load_env.sh && python3 get_node_context.py
+
+The load_env.sh script reads your .env file and sets the variables.
+You need to run this once per terminal session.
+
+
+TROUBLESHOOTING
+---------------
+"Error: Jira returned 401 Unauthorized"
+  → Your JIRA_EMAIL or JIRA_API_TOKEN is wrong. Double-check both.
+  → Make sure there are no extra spaces around the values.
+  → Token might have expired — generate a new one.
+
+"No rack info available"
+  → NetBox token might be missing or wrong.
+  → This is OK — the app still works for Jira features.
+
+"command not found: python3"
+  → Install Python 3.10+
+  → macOS: brew install python3
+  → Ubuntu: sudo apt install python3
+
+"No module named 'requests'"
+  → Run: pip3 install requests
+
+
+SECURITY NOTES
+--------------
+- NEVER share your .env file with anyone
+- NEVER commit .env to git (it's already in .gitignore)
+- Your tokens give access to YOUR Jira and NetBox accounts
+- If you think a token is compromised, revoke it immediately:
+  Jira:   https://id.atlassian.com/manage-profile/security/api-tokens
+  NetBox: https://coreweave.cloud.netboxapp.com/user/api-tokens/

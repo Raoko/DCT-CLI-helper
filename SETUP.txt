@@ -1,0 +1,59 @@
+CW Node Helper — Quick Setup
+=============================
+
+HEADS UP:
+  This tool connects to Jira, NetBox, and Grafana using YOUR credentials.
+  It does NOT store or transmit your tokens anywhere except locally in .env.
+  Never share your .env file or commit it to git.
+
+Requirements:
+  - Python 3.10+ (check: python3 --version)
+  - macOS or Linux terminal (Windows WSL works too)
+  - Jira API token (required — the tool won't work without it)
+  - NetBox API token (optional — enables rack view, connections, device lookup)
+  - openpyxl (optional — only needed if you want to regenerate IB topology from cutsheets)
+
+Steps:
+
+1. Install dependencies:
+   pip3 install requests
+
+   Optional (for IB cutsheet processing):
+   pip3 install openpyxl
+
+2. Create your .env file (copy the example):
+   cp .env.example .env
+
+3. Edit .env and fill in YOUR credentials:
+   - JIRA_EMAIL       → your @coreweave.com email
+   - JIRA_API_TOKEN   → generate at https://id.atlassian.com/manage-profile/security/api-tokens
+   - NETBOX_API_URL   → (optional) https://coreweave.cloud.netboxapp.com/api
+   - NETBOX_API_TOKEN → (optional) your NetBox API token
+
+4. Run it:
+   source load_env.sh && python3 get_node_context.py
+
+5. Type ? at any menu for help. Press [?] inside a ticket for hotkey reference.
+
+What's included:
+  - get_node_context.py   — the app (single file)
+  - ib_topology.json      — IB port mappings for EVI01 + CDZ01 (pre-generated)
+  - dh_layouts.json       — data hall rack layouts (EVI01 DH1 + CDZ01 SEC1)
+  - site/index.html       — visual docs (open in browser, or press ? then w)
+  - test_integrity.py     — unit tests (python3 test_integrity.py)
+  - source/               — IB cutsheet Excel files (reference only, not needed to run)
+
+Key features:
+  - Jira DO/HO ticket lookup with full NetBox enrichment
+  - Queue browser with site/status filtering + bookmarks
+  - Rack map (serpentine DH1 + 3-column SEC1)
+  - Rack elevation with adjacent rack neighbors + cab# navigation
+  - IB port connections from cutsheet (EVI01 DH1/DH2 + CDZ01)
+  - BMC/DPU/NIC connections from NetBox
+  - Status transitions (start, verify, hold, resume, close)
+  - Add comments to tickets from the terminal
+  - Background queue watcher with notifications
+  - SLA guidance and ticket health assessment
+  - Grafana dashboard links with pre-filled parameters
+
+Questions? Ask Ricky.

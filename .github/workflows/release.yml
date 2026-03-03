@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install requests
+      - run: python3 test_integrity.py
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build release zip
+        run: |
+          mkdir -p release/cw-node-helper
+          cp get_node_context.py release/cw-node-helper/
+          cp ib_topology.json release/cw-node-helper/
+          [ -f dh_layouts.json ] && cp dh_layouts.json release/cw-node-helper/ || true
+          cp load_env.sh release/cw-node-helper/
+          cp update.sh release/cw-node-helper/
+          cp .env.example release/cw-node-helper/
+          cp ENV_GUIDE.txt release/cw-node-helper/
+          cp SETUP.txt release/cw-node-helper/
+          cp requirements.txt release/cw-node-helper/
+          cp test_integrity.py release/cw-node-helper/
+          cp .gitignore release/cw-node-helper/
+          cp -r site release/cw-node-helper/
+          cd release && zip -r cw-node-helper.zip cw-node-helper/
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: release/cw-node-helper.zip
+          generateReleaseNotes: true
