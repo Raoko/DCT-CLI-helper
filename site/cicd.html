@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#08080a">
+<title>CI/CD Pipeline — CW Node Helper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ------------------------------------------------------------------ */
+/*  RESET & BASE                                                      */
+/* ------------------------------------------------------------------ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:        #08080a;
+  --bg-raised: #0f1014;
+  --surface:   #1a1b24;
+  --border:    #222330;
+  --border-lt: #2a2b3a;
+
+  --text:      #c8c9d4;
+  --text-dim:  #6b6d80;
+  --text-mute: #44465a;
+
+  --accent:    #d4943a;
+  --accent-lt: #e8b86a;
+  --accent-dk: #8a5e1e;
+
+  --ansi-red:     #e06c75;
+  --ansi-green:   #98c379;
+  --ansi-yellow:  #e5c07b;
+  --ansi-blue:    #61afef;
+  --ansi-magenta: #c678dd;
+  --ansi-cyan:    #56b6c2;
+  --ansi-white:   #dcdfe4;
+  --ansi-dim:     #636578;
+
+  --bg-terminal:        #0c0d12;
+  --bg-terminal-chrome: #16171e;
+
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent-dk);
+  color: var(--ansi-white);
+}
+
+a { color: var(--accent-lt); text-decoration: none; }
+a:hover { color: var(--accent); }
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+
+/* ------------------------------------------------------------------ */
+/*  LAYOUT                                                            */
+/* ------------------------------------------------------------------ */
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 3rem);
+}
+
+/* ------------------------------------------------------------------ */
+/*  NAV                                                               */
+/* ------------------------------------------------------------------ */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 1rem 0;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.4s;
+}
+
+nav.scrolled { border-bottom-color: var(--border); }
+
+nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ansi-white);
+  letter-spacing: -0.02em;
+}
+
+.nav-brand span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+@media (max-width: 640px) {
+  .nav-links { gap: 1rem; }
+  .nav-links a { font-size: 0.72rem; }
+}
+
+@media (max-width: 480px) {
+  .nav-links { display: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  HERO                                                              */
+/* ------------------------------------------------------------------ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 6rem;
+  position: relative;
+}
+
+.hero-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hero-label::before {
+  content: '';
+  width: 2rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+h1 {
+  font-family: var(--font-body);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: var(--ansi-white);
+  margin-bottom: 1.5rem;
+}
+
+h1 .hl { color: var(--accent); }
+
+.hero-sub {
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
+  color: var(--text-dim);
+  line-height: 1.7;
+  max-width: 540px;
+  margin-bottom: 3rem;
+}
+
+/* ------------------------------------------------------------------ */
+/*  PIPELINE HERO DIAGRAM                                             */
+/* ------------------------------------------------------------------ */
+.pipeline-hero {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.pipe-node {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.pipe-box {
+  background: var(--bg-terminal);
+  border: 1px solid var(--border);
+  padding: 0.6rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  color: var(--text-dim);
+  white-space: nowrap;
+  position: relative;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.pipe-box:hover {
+  border-color: var(--accent-dk);
+  color: var(--text);
+}
+
+.pipe-box .pipe-icon {
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+
+.pipe-box.active {
+  border-color: var(--accent-dk);
+  color: var(--ansi-white);
+}
+
+.pipe-box.active .pipe-icon { color: var(--ansi-green); }
+
+.pipe-arrow {
+  font-family: var(--font-mono);
+  color: var(--text-mute);
+  font-size: 0.72rem;
+  padding: 0 0.5rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+  .pipeline-hero {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .pipe-node { flex-direction: column; }
+  .pipe-arrow {
+    transform: rotate(90deg);
+    padding: 0.25rem 0;
+    text-align: center;
+  }
+  .pipe-box { text-align: center; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  SECTION STYLES                                                    */
+/* ------------------------------------------------------------------ */
+.section {
+  padding: clamp(4rem, 8vw, 7rem) 0;
+  border-top: 1px solid var(--border);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-label::before {
+  content: '';
+  width: 2rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.section h2 {
+  font-family: var(--font-body);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ansi-white);
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.section-desc {
+  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  color: var(--text-dim);
+  line-height: 1.7;
+  max-width: 600px;
+  margin-bottom: 2.5rem;
+}
+
+/* ------------------------------------------------------------------ */
+/*  TERMINAL WINDOW                                                   */
+/* ------------------------------------------------------------------ */
+.terminal {
+  background: var(--bg-terminal);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: clamp(0.62rem, 1.1vw, 0.78rem);
+  line-height: 1.55;
+  position: relative;
+}
+
+.terminal-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--bg-terminal-chrome);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.terminal-dot.r { background: #ff5f57; }
+.terminal-dot.y { background: #febc2e; }
+.terminal-dot.g { background: #28c840; }
+
+.terminal-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.68rem;
+  color: var(--text-mute);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.terminal-body {
+  padding: clamp(1rem, 2vw, 1.5rem);
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--text);
+}
+
+.terminal::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid transparent;
+  pointer-events: none;
+  transition: border-color 0.4s;
+}
+
+.terminal:hover::after {
+  border-color: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* ANSI classes */
+.t-bold   { font-weight: 600; }
+.t-dim    { color: var(--ansi-dim); }
+.t-red    { color: var(--ansi-red); }
+.t-green  { color: var(--ansi-green); }
+.t-yellow { color: var(--ansi-yellow); }
+.t-blue   { color: var(--ansi-blue); }
+.t-mag    { color: var(--ansi-magenta); }
+.t-cyan   { color: var(--ansi-cyan); }
+.t-white  { color: var(--ansi-white); }
+
+.cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  background: var(--accent);
+  vertical-align: text-bottom;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  FLOWCHART                                                         */
+/* ------------------------------------------------------------------ */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  max-width: 900px;
+}
+
+.flow-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.flow-connector {
+  width: 48px;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flow-connector::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--border-lt);
+}
+
+.flow-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--bg);
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.flow-dot.green { border-color: var(--ansi-green); }
+.flow-dot.blue { border-color: var(--ansi-blue); }
+.flow-dot.yellow { border-color: var(--ansi-yellow); }
+.flow-dot.magenta { border-color: var(--ansi-magenta); }
+.flow-dot.cyan { border-color: var(--ansi-cyan); }
+
+.flow-card {
+  flex: 1;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  padding: 1.25rem 1.5rem;
+  margin: 0.5rem 0;
+  transition: border-color 0.3s;
+}
+
+.flow-card:hover { border-color: var(--border-lt); }
+
+.flow-card-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.flow-card-label.local { color: var(--accent); }
+.flow-card-label.push { color: var(--ansi-green); }
+.flow-card-label.ci { color: var(--ansi-blue); }
+.flow-card-label.test { color: var(--ansi-yellow); }
+.flow-card-label.release { color: var(--ansi-magenta); }
+.flow-card-label.share { color: var(--ansi-cyan); }
+
+.flow-card h3 {
+  font-family: var(--font-body);
+  font-size: clamp(0.88rem, 1.3vw, 1rem);
+  font-weight: 600;
+  color: var(--ansi-white);
+  margin-bottom: 0.35rem;
+}
+
+.flow-card p {
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 1vw, 0.76rem);
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.flow-card code {
+  background: var(--surface);
+  padding: 0.1rem 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text);
+}
+
+.flow-row:first-child .flow-connector::before { top: 50%; }
+.flow-row:last-child .flow-connector::before { bottom: 50%; }
+
+@media (max-width: 600px) {
+  .flow-connector { width: 32px; }
+  .flow-card { padding: 1rem; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  DUAL GRID                                                         */
+/* ------------------------------------------------------------------ */
+.dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 800px) {
+  .dual-grid { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  STATUS MATRIX                                                     */
+/* ------------------------------------------------------------------ */
+.matrix {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+.matrix-cell {
+  background: var(--bg-raised);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.matrix-version {
+  font-family: var(--font-mono);
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  font-weight: 600;
+  color: var(--ansi-white);
+  margin-bottom: 0.25rem;
+}
+
+.matrix-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+.matrix-status {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  margin-top: 0.5rem;
+}
+
+.matrix-status.pass { color: var(--ansi-green); }
+.matrix-status.pass::before { content: '● '; }
+
+@media (max-width: 480px) {
+  .matrix { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  STEPS (numbered setup-style)                                      */
+/* ------------------------------------------------------------------ */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  counter-reset: step;
+}
+
+.step {
+  background: var(--bg-raised);
+  padding: 1.75rem 2rem;
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  counter-increment: step;
+}
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  padding-top: 0.15rem;
+}
+
+.step h3 {
+  font-family: var(--font-body);
+  font-size: clamp(0.92rem, 1.3vw, 1.05rem);
+  font-weight: 600;
+  color: var(--ansi-white);
+  margin-bottom: 0.4rem;
+}
+
+.step p {
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+.step code {
+  background: var(--surface);
+  padding: 0.1rem 0.4rem;
+  font-size: 0.74rem;
+  color: var(--text);
+}
+
+@media (max-width: 600px) {
+  .step {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  CHEAT SHEET                                                       */
+/* ------------------------------------------------------------------ */
+.cheat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.cheat-card {
+  background: var(--bg-raised);
+  padding: 1.5rem;
+}
+
+.cheat-card h3 {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ansi-white);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cheat-card h3 .cheat-icon {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--accent);
+}
+
+.cheat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 1vw, 0.76rem);
+}
+
+.cheat-row:last-child { border-bottom: none; }
+
+.cheat-cmd {
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.cheat-desc {
+  color: var(--text-dim);
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .cheat-grid { grid-template-columns: 1fr; }
+  .cheat-row { flex-direction: column; gap: 0.15rem; }
+  .cheat-desc { text-align: left; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  SHARE SECTION — friendly non-tech                                 */
+/* ------------------------------------------------------------------ */
+.share-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 800px;
+}
+
+.share-step {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: 0;
+  position: relative;
+}
+
+.share-step-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1.75rem;
+}
+
+.share-step-num {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+}
+
+.share-step-line {
+  flex: 1;
+  width: 1px;
+  background: var(--border-lt);
+}
+
+.share-step:last-child .share-step-line { display: none; }
+
+.share-step-content {
+  padding: 1.25rem 0 2rem 1.5rem;
+}
+
+.share-step-content h3 {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  font-weight: 600;
+  color: var(--ansi-white);
+  margin-bottom: 0.5rem;
+}
+
+.share-step-content p {
+  font-size: clamp(0.82rem, 1.2vw, 0.92rem);
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+
+.share-step-content .share-cmd {
+  background: var(--bg-terminal);
+  border: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: clamp(0.7rem, 1vw, 0.78rem);
+  color: var(--ansi-green);
+  white-space: pre;
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.share-step-content .friendly-note {
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 1vw, 0.74rem);
+  color: var(--accent);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .share-step { grid-template-columns: 3rem 1fr; }
+  .share-step-content { padding-left: 1rem; }
+  .share-step-num { width: 2rem; height: 2rem; font-size: 0.72rem; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  FILE TREE                                                         */
+/* ------------------------------------------------------------------ */
+.file-tree {
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  line-height: 1.8;
+  background: var(--bg-terminal);
+  border: 1px solid var(--border);
+  padding: clamp(1.25rem, 2vw, 2rem);
+  overflow-x: auto;
+}
+
+.file-tree .dir { color: var(--ansi-blue); font-weight: 600; }
+.file-tree .file { color: var(--text-dim); }
+.file-tree .file-main { color: var(--ansi-green); font-weight: 500; }
+.file-tree .file-ci { color: var(--ansi-yellow); }
+.file-tree .file-data { color: var(--ansi-cyan); }
+.file-tree .file-doc { color: var(--ansi-magenta); }
+.file-tree .comment { color: var(--text-mute); font-style: italic; }
+
+/* ------------------------------------------------------------------ */
+/*  MIGRATION                                                         */
+/* ------------------------------------------------------------------ */
+.migrate-commands {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.migrate-cmd {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+
+.migrate-cmd:last-child { border-bottom: none; }
+
+.migrate-num {
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.migrate-cmd code {
+  display: block;
+  background: var(--bg-terminal);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1vw, 0.8rem);
+  color: var(--ansi-green);
+  margin-top: 0.35rem;
+}
+
+.migrate-cmd p {
+  font-family: var(--font-mono);
+  font-size: clamp(0.74rem, 1.1vw, 0.82rem);
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------ */
+/*  TIP / WARN BOXES                                                  */
+/* ------------------------------------------------------------------ */
+.tip-box {
+  border-left: 2px solid var(--accent);
+  padding: 0.75rem 1rem;
+  margin: 1.5rem 0;
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1vw, 0.8rem);
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+.tip-box::before {
+  content: 'TIP';
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.25rem;
+}
+
+.tip-box strong { color: var(--ansi-white); font-weight: 600; }
+
+.warn-box {
+  border-left: 2px solid var(--ansi-red);
+  padding: 0.75rem 1rem;
+  margin: 1.5rem 0;
+  background: color-mix(in srgb, var(--ansi-red) 4%, transparent);
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1vw, 0.8rem);
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+.warn-box::before {
+  content: 'IMPORTANT';
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--ansi-red);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.25rem;
+}
+
+.warn-box strong { color: var(--ansi-white); font-weight: 600; }
+
+/* ------------------------------------------------------------------ */
+/*  FOOTER                                                            */
+/* ------------------------------------------------------------------ */
+footer {
+  padding: 3rem 0;
+  border-top: 1px solid var(--border);
+}
+
+footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-left {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-dim);
+}
+
+.footer-left strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.footer-right {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-mute);
+}
+
+/* ------------------------------------------------------------------ */
+/*  SCROLL REVEAL                                                     */
+/* ------------------------------------------------------------------ */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ------------------------------------------------------------------ */
+/*  AMBIENT GLOW                                                      */
+/* ------------------------------------------------------------------ */
+.glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.06;
+  pointer-events: none;
+  will-change: transform;
+  contain: layout style;
+}
+
+.glow-amber { background: var(--accent); top: 10%; right: -10%; }
+.glow-blue { background: var(--ansi-blue); bottom: -10%; left: -15%; }
+
+/* ------------------------------------------------------------------ */
+/*  PITCH BAR                                                         */
+/* ------------------------------------------------------------------ */
+.pitch-bar {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: clamp(2rem, 4vw, 3rem) 0;
+  background: var(--bg-raised);
+}
+
+.pitch-statement {
+  font-family: var(--font-mono);
+  font-size: clamp(0.76rem, 1.2vw, 0.88rem);
+  color: var(--text-dim);
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
+
+.pitch-statement strong { color: var(--ansi-white); font-weight: 600; }
+.pitch-statement .hl-accent { color: var(--accent); font-weight: 500; }
+.pitch-statement .hl-green { color: var(--ansi-green); }
+
+/* ------------------------------------------------------------------ */
+/*  REDUCED MOTION                                                    */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================================================================ -->
+<!--  NAV                                                             -->
+<!-- ================================================================ -->
+<nav id="nav" aria-label="Main navigation">
+  <div class="wrap">
+    <a href="index.html" class="nav-brand"><span>cw</span>-node-helper</a>
+    <ul class="nav-links">
+      <li><a href="#flow">Pipeline</a></li>
+      <li><a href="#ci">CI Details</a></li>
+      <li><a href="#release">Release</a></li>
+      <li><a href="#tips">Tips</a></li>
+      <li><a href="#share">Sharing</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ================================================================ -->
+<!--  HERO                                                            -->
+<!-- ================================================================ -->
+<section class="hero">
+  <div class="glow glow-amber"></div>
+  <div class="glow glow-blue"></div>
+  <div class="wrap">
+    <div class="hero-label">CI/CD Pipeline</div>
+    <h1>Push code.<br>Tests run.<br><span class="hl">Releases build themselves.</span></h1>
+    <p class="hero-sub">Your complete guide to how code moves from your editor to your teammates' machines &mdash; automatically tested, packaged, and published.</p>
+
+    <div class="pipeline-hero reveal">
+      <div class="pipe-node">
+        <div class="pipe-box"><span class="pipe-icon">$</span> edit code</div>
+        <span class="pipe-arrow">&rarr;</span>
+      </div>
+      <div class="pipe-node">
+        <div class="pipe-box"><span class="pipe-icon">$</span> git push</div>
+        <span class="pipe-arrow">&rarr;</span>
+      </div>
+      <div class="pipe-node">
+        <div class="pipe-box active"><span class="pipe-icon">&cir;</span> GitHub Actions</div>
+        <span class="pipe-arrow">&rarr;</span>
+      </div>
+      <div class="pipe-node">
+        <div class="pipe-box"><span class="pipe-icon">&check;</span> 94 tests &times; 3 Pythons</div>
+        <span class="pipe-arrow">&rarr;</span>
+      </div>
+      <div class="pipe-node">
+        <div class="pipe-box"><span class="pipe-icon">&darr;</span> Release zip</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  PITCH BAR                                                       -->
+<!-- ================================================================ -->
+<div class="pitch-bar">
+  <div class="wrap">
+    <p class="pitch-statement">
+      Every push to <strong>rpatino/cw-node-helper</strong> triggers <span class="hl-accent">automated tests</span> on Python 3.9, 3.11, and 3.13.
+      Tag a version &rarr; a <span class="hl-green">clean zip</span> is built and published as a GitHub Release. No manual steps.
+    </p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--  PIPELINE FLOW                                                   -->
+<!-- ================================================================ -->
+<section id="flow" class="section">
+  <div class="wrap">
+    <div class="section-label">Full Workflow</div>
+    <h2>How code reaches your teammates</h2>
+    <p class="section-desc">From the moment you save a file to the moment a teammate runs the update script &mdash; every step, automated.</p>
+
+    <div class="flow reveal">
+      <div class="flow-row">
+        <div class="flow-connector">
+          <div class="flow-dot"></div>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-label local">You &mdash; Local</div>
+          <h3>Edit code in your editor</h3>
+          <p>Make changes to <code>get_node_context.py</code>, fix bugs, add features. Save the file.</p>
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <div class="flow-connector">
+          <div class="flow-dot green"></div>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-label push">You &mdash; Terminal</div>
+          <h3>Stage, commit, push</h3>
+          <p><code>git add</code> your changes &rarr; <code>git commit</code> with a message &rarr; <code>git push</code> to GitHub. Takes 10 seconds.</p>
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <div class="flow-connector">
+          <div class="flow-dot blue"></div>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-label ci">Automatic &mdash; GitHub Actions</div>
+          <h3>CI pipeline triggers</h3>
+          <p>GitHub detects the push and spins up 3 virtual machines &mdash; one for each Python version (3.9, 3.11, 3.13). Runs <code>test_integrity.py</code> on all three.</p>
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <div class="flow-connector">
+          <div class="flow-dot yellow"></div>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-label test">Automatic &mdash; Test Results</div>
+          <h3>94 tests validate your code</h3>
+          <p>Menu navigation, hotkeys, panels, transitions, rack math, config integrity &mdash; all checked in under 15 seconds. Red X if anything breaks.</p>
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <div class="flow-connector">
+          <div class="flow-dot magenta"></div>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-label release">You tag &rarr; Automatic</div>
+          <h3>Release builds and publishes</h3>
+          <p>When you tag (<code>git tag v6.3.0</code>), GitHub builds a clean zip &mdash; no .env, no source/, no __pycache__. Published as a GitHub Release with auto changelog.</p>
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <div class="flow-connector">
+          <div class="flow-dot cyan"></div>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-label share">Teammates</div>
+          <h3>They run update.sh</h3>
+          <p>Teammates download the release zip and run <code>bash update.sh</code>. Their .env and bookmarks are preserved. Done in 5 seconds.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  HOW PUSHES WORK                                                 -->
+<!-- ================================================================ -->
+<section id="pushing" class="section">
+  <div class="wrap">
+    <div class="section-label">Git Basics</div>
+    <h2>How pushes work</h2>
+    <p class="section-desc">Three commands. That's it. Every change you make follows this pattern.</p>
+
+    <div class="dual-grid reveal">
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <span class="terminal-dot r"></span>
+          <span class="terminal-dot y"></span>
+          <span class="terminal-dot g"></span>
+          <span class="terminal-title">pushing a change</span>
+        </div>
+        <div class="terminal-body"><span class="t-dim"># 1. See what changed</span>
+<span class="t-cyan">$</span> git status
+<span class="t-red">  modified:   get_node_context.py</span>
+
+<span class="t-dim"># 2. Stage + commit</span>
+<span class="t-cyan">$</span> git add get_node_context.py
+<span class="t-cyan">$</span> git commit -m <span class="t-green">"feat: add SDA to search projects"</span>
+<span class="t-dim">  [rpatino/cw-node-helper f1d4c6e] feat: add SDA...</span>
+<span class="t-dim">  1 file changed, 3 insertions(+)</span>
+
+<span class="t-dim"># 3. Push to GitHub</span>
+<span class="t-cyan">$</span> git push
+<span class="t-green">  &#x2192; rpatino/cw-node-helper</span>  <span class="t-dim">pushed</span>
+<span class="t-dim">  CI will start running now...</span></div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <span class="terminal-dot r"></span>
+          <span class="terminal-dot y"></span>
+          <span class="terminal-dot g"></span>
+          <span class="terminal-title">what happens next</span>
+        </div>
+        <div class="terminal-body"><span class="t-yellow">GitHub Actions detected push</span>
+<span class="t-dim">  branch: rpatino/cw-node-helper</span>
+<span class="t-dim">  commit: f1d4c6e</span>
+
+<span class="t-blue">Spinning up test runners...</span>
+
+<span class="t-green">&#x2713;</span> test (3.9)   <span class="t-dim">94 tests</span>  <span class="t-green">passed</span>  <span class="t-dim">17s</span>
+<span class="t-green">&#x2713;</span> test (3.11)  <span class="t-dim">94 tests</span>  <span class="t-green">passed</span>  <span class="t-dim">10s</span>
+<span class="t-green">&#x2713;</span> test (3.13)  <span class="t-dim">94 tests</span>  <span class="t-green">passed</span>  <span class="t-dim">11s</span>
+
+<span class="t-green">All checks passed</span> <span class="t-dim">&#x2714;</span>
+<span class="t-dim">View run:</span> <span class="t-cyan">github.com/.../actions/runs/...</span></div>
+      </div>
+    </div>
+
+    <div class="tip-box reveal reveal-delay-1">
+      <strong>Commit message convention:</strong> start with a type &mdash; <code>feat:</code> for features, <code>fix:</code> for bugs, <code>docs:</code> for documentation, <code>test:</code> for tests, <code>ci:</code> for pipeline changes.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  CI PIPELINE DETAILS                                             -->
+<!-- ================================================================ -->
+<section id="ci" class="section" style="background: var(--bg-raised);">
+  <div class="wrap">
+    <div class="section-label">Continuous Integration</div>
+    <h2>What CI tests and when</h2>
+    <p class="section-desc">Every push triggers a test matrix. Here's exactly what runs and what it validates.</p>
+
+    <div class="matrix reveal">
+      <div class="matrix-cell">
+        <div class="matrix-version">3.9</div>
+        <div class="matrix-label">Python</div>
+        <div class="matrix-status pass">tested</div>
+      </div>
+      <div class="matrix-cell">
+        <div class="matrix-version">3.11</div>
+        <div class="matrix-label">Python</div>
+        <div class="matrix-status pass">tested</div>
+      </div>
+      <div class="matrix-cell">
+        <div class="matrix-version">3.13</div>
+        <div class="matrix-label">Python</div>
+        <div class="matrix-status pass">tested</div>
+      </div>
+    </div>
+
+    <div class="dual-grid reveal" style="margin-top: 2.5rem;">
+      <div>
+        <div class="section-label" style="margin-bottom: 1.5rem;">Triggers</div>
+        <div class="terminal">
+          <div class="terminal-chrome">
+            <span class="terminal-dot r"></span>
+            <span class="terminal-dot y"></span>
+            <span class="terminal-dot g"></span>
+            <span class="terminal-title">ci.yml</span>
+          </div>
+          <div class="terminal-body"><span class="t-yellow">on:</span>
+  <span class="t-blue">push:</span>
+    branches:
+      - <span class="t-green">main</span>
+      - <span class="t-green">rpatino/cw-node-helper</span>
+  <span class="t-blue">pull_request:</span>
+    <span class="t-dim"># all PRs get tested</span></div>
+        </div>
+        <div class="tip-box" style="margin-top: 1rem;">
+          CI runs on <strong>every push</strong> to your branch and on <strong>every PR</strong> opened against any branch.
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label" style="margin-bottom: 1.5rem;">What's validated</div>
+        <div class="terminal">
+          <div class="terminal-chrome">
+            <span class="terminal-dot r"></span>
+            <span class="terminal-dot y"></span>
+            <span class="terminal-dot g"></span>
+            <span class="terminal-title">test_integrity.py</span>
+          </div>
+          <div class="terminal-body"><span class="t-white t-bold">94 tests across 8 categories:</span>
+
+<span class="t-green">&#x25cf;</span> Menu navigation &amp; option routing
+<span class="t-green">&#x25cf;</span> Hotkey handlers (a-z, special keys)
+<span class="t-green">&#x25cf;</span> Panel rendering &amp; display
+<span class="t-green">&#x25cf;</span> Ticket state transitions
+<span class="t-green">&#x25cf;</span> Config integrity (sites, fields)
+<span class="t-green">&#x25cf;</span> Search project validation
+<span class="t-green">&#x25cf;</span> Jira key pattern matching
+<span class="t-green">&#x25cf;</span> Rack math &amp; layout logic</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  RELEASE PROCESS                                                 -->
+<!-- ================================================================ -->
+<section id="release" class="section">
+  <div class="wrap">
+    <div class="section-label">Release Automation</div>
+    <h2>How releases ship</h2>
+    <p class="section-desc">Tag a version, push the tag. GitHub builds the zip and publishes it. No manual zipping, no Google Drive.</p>
+
+    <div class="terminal reveal" style="max-width: 700px;">
+      <div class="terminal-chrome">
+        <span class="terminal-dot r"></span>
+        <span class="terminal-dot y"></span>
+        <span class="terminal-dot g"></span>
+        <span class="terminal-title">releasing v6.3.0</span>
+      </div>
+      <div class="terminal-body"><span class="t-dim"># 1. Update version in the code</span>
+<span class="t-cyan">$</span> vim get_node_context.py  <span class="t-dim"># change APP_VERSION</span>
+
+<span class="t-dim"># 2. Commit the version bump</span>
+<span class="t-cyan">$</span> git add get_node_context.py
+<span class="t-cyan">$</span> git commit -m <span class="t-green">"release: v6.3.0"</span>
+
+<span class="t-dim"># 3. Tag it</span>
+<span class="t-cyan">$</span> git tag <span class="t-yellow">v6.3.0</span>
+
+<span class="t-dim"># 4. Push code + tag together</span>
+<span class="t-cyan">$</span> git push origin rpatino/cw-node-helper --tags
+
+<span class="t-yellow">&#x279C; GitHub Actions:</span>
+  <span class="t-blue">1.</span> Runs tests on Python 3.13    <span class="t-green">&#x2713; passed</span>
+  <span class="t-blue">2.</span> Builds release zip            <span class="t-green">&#x2713; built</span>
+  <span class="t-blue">3.</span> Publishes GitHub Release       <span class="t-green">&#x2713; published</span>
+  <span class="t-blue">4.</span> Auto-generates changelog       <span class="t-green">&#x2713; done</span>
+
+<span class="t-green t-bold">Release live at:</span>
+<span class="t-cyan">github.com/coreweave/TopoWeave/releases/latest</span></div>
+    </div>
+
+    <div class="section-label reveal" style="margin-top: 3rem; margin-bottom: 1.5rem;">What's in the zip</div>
+
+    <div class="dual-grid reveal">
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <span class="terminal-dot r"></span>
+          <span class="terminal-dot y"></span>
+          <span class="terminal-dot g"></span>
+          <span class="terminal-title">cw-node-helper.zip contents</span>
+        </div>
+        <div class="terminal-body"><span class="t-green t-bold">Included:</span>
+  <span class="t-white">get_node_context.py</span>   <span class="t-dim">the app</span>
+  <span class="t-white">ib_topology.json</span>      <span class="t-dim">IB port maps</span>
+  <span class="t-white">load_env.sh</span>           <span class="t-dim">env loader</span>
+  <span class="t-white">update.sh</span>             <span class="t-dim">self-updater</span>
+  <span class="t-white">.env.example</span>          <span class="t-dim">credential template</span>
+  <span class="t-white">ENV_GUIDE.txt</span>         <span class="t-dim">setup guide</span>
+  <span class="t-white">SETUP.txt</span>             <span class="t-dim">quick start</span>
+  <span class="t-white">requirements.txt</span>      <span class="t-dim">dependencies</span>
+  <span class="t-white">test_integrity.py</span>     <span class="t-dim">test suite</span>
+  <span class="t-white">site/</span>                 <span class="t-dim">docs website</span></div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <span class="terminal-dot r"></span>
+          <span class="terminal-dot y"></span>
+          <span class="terminal-dot g"></span>
+          <span class="terminal-title">excluded from zip</span>
+        </div>
+        <div class="terminal-body"><span class="t-red t-bold">Never shipped:</span>
+  <span class="t-red">.env</span>                  <span class="t-dim">your API tokens</span>
+  <span class="t-red">source/</span>               <span class="t-dim">15MB Excel files</span>
+  <span class="t-red">__pycache__/</span>          <span class="t-dim">Python bytecode</span>
+  <span class="t-red">.cwhelper_state.json</span>  <span class="t-dim">personal bookmarks</span>
+  <span class="t-red">.DS_Store</span>             <span class="t-dim">macOS junk</span>
+  <span class="t-red">docs/</span>                 <span class="t-dim">dev notes</span>
+  <span class="t-red">CLAUDE.md</span>             <span class="t-dim">AI config</span></div>
+      </div>
+    </div>
+
+    <div class="warn-box reveal reveal-delay-1">
+      <strong>Tests gate the release.</strong> If any test fails, the zip is not built and the release is not published. Fix the tests first, then re-tag.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  TIPS & TRICKS                                                   -->
+<!-- ================================================================ -->
+<section id="tips" class="section" style="background: var(--bg-raised);">
+  <div class="wrap">
+    <div class="section-label">Tips &amp; Tricks</div>
+    <h2>Git cheatsheet &amp; CI commands</h2>
+    <p class="section-desc">The commands you'll use every day, and the ones you'll need when something goes wrong.</p>
+
+    <div class="cheat-grid reveal">
+      <div class="cheat-card">
+        <h3><span class="cheat-icon">$</span> Everyday Git</h3>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git status</span>
+          <span class="cheat-desc">see what changed</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git add <em>file</em></span>
+          <span class="cheat-desc">stage a file</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git commit -m "msg"</span>
+          <span class="cheat-desc">commit staged changes</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git push</span>
+          <span class="cheat-desc">push to GitHub</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git log --oneline -10</span>
+          <span class="cheat-desc">recent commits</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git diff</span>
+          <span class="cheat-desc">see unstaged changes</span>
+        </div>
+      </div>
+
+      <div class="cheat-card">
+        <h3><span class="cheat-icon">&check;</span> CI &amp; Releases</h3>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh run list</span>
+          <span class="cheat-desc">see CI run history</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh run view <em>ID</em></span>
+          <span class="cheat-desc">check specific run</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh run view --log-failed</span>
+          <span class="cheat-desc">see why it failed</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git tag v6.3.0</span>
+          <span class="cheat-desc">tag a release</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git push --tags</span>
+          <span class="cheat-desc">push tags to trigger release</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh release list</span>
+          <span class="cheat-desc">list all releases</span>
+        </div>
+      </div>
+
+      <div class="cheat-card">
+        <h3><span class="cheat-icon">&#x26A0;</span> When Things Break</h3>
+        <div class="cheat-row">
+          <span class="cheat-cmd">python3 test_integrity.py</span>
+          <span class="cheat-desc">run tests locally first</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh run view --log-failed</span>
+          <span class="cheat-desc">read the CI error log</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git stash</span>
+          <span class="cheat-desc">stash changes temporarily</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git stash pop</span>
+          <span class="cheat-desc">restore stashed changes</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git tag -d v6.3.0</span>
+          <span class="cheat-desc">delete a bad local tag</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">git push origin :v6.3.0</span>
+          <span class="cheat-desc">delete a bad remote tag</span>
+        </div>
+      </div>
+
+      <div class="cheat-card">
+        <h3><span class="cheat-icon">&cir;</span> GitHub CLI (gh)</h3>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh auth status</span>
+          <span class="cheat-desc">check login status</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh repo view</span>
+          <span class="cheat-desc">repo info</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh pr create</span>
+          <span class="cheat-desc">create a pull request</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh pr list</span>
+          <span class="cheat-desc">list open PRs</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh browse</span>
+          <span class="cheat-desc">open repo in browser</span>
+        </div>
+        <div class="cheat-row">
+          <span class="cheat-cmd">gh release download</span>
+          <span class="cheat-desc">download latest release</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box reveal" style="margin-top: 2rem; max-width: 700px;">
+      <strong>Pro tip:</strong> Always run <code>python3 test_integrity.py</code> locally before pushing. If tests pass on your machine, they'll pass in CI. Saves you from waiting for a red X.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  SHARING WITH OTHERS                                             -->
+<!-- ================================================================ -->
+<section id="share" class="section">
+  <div class="wrap">
+    <div class="section-label">Sharing &amp; Distribution</div>
+    <h2>How to give this app to a teammate</h2>
+    <p class="section-desc">A step-by-step guide designed for anyone &mdash; no git knowledge required. Just follow the numbers.</p>
+
+    <div class="share-steps reveal">
+
+      <div class="share-step">
+        <div class="share-step-side">
+          <div class="share-step-num">1</div>
+          <div class="share-step-line"></div>
+        </div>
+        <div class="share-step-content">
+          <h3>Check if Python is installed</h3>
+          <p>Open Terminal (search "Terminal" in Spotlight) and type:</p>
+          <div class="share-cmd">python3 --version</div>
+          <p>If you see <strong>Python 3.10</strong> or higher, you're good. If not, install it:</p>
+          <div class="share-cmd">brew install python@3.13</div>
+          <p class="friendly-note">No Homebrew? Visit brew.sh and paste the install command they show you.</p>
+        </div>
+      </div>
+
+      <div class="share-step">
+        <div class="share-step-side">
+          <div class="share-step-num">2</div>
+          <div class="share-step-line"></div>
+        </div>
+        <div class="share-step-content">
+          <h3>Install the one dependency</h3>
+          <p>The app only needs one Python package:</p>
+          <div class="share-cmd">pip3 install requests</div>
+          <p class="friendly-note">That's it. No frameworks, no databases, no Docker.</p>
+        </div>
+      </div>
+
+      <div class="share-step">
+        <div class="share-step-side">
+          <div class="share-step-num">3</div>
+          <div class="share-step-line"></div>
+        </div>
+        <div class="share-step-content">
+          <h3>Download the release zip</h3>
+          <p>Go to the GitHub Releases page and download <strong>cw-node-helper.zip</strong>:</p>
+          <div class="share-cmd">https://github.com/coreweave/TopoWeave/releases/latest</div>
+          <p>Or if you have the <code>gh</code> CLI:</p>
+          <div class="share-cmd">gh release download --repo coreweave/TopoWeave --pattern "*.zip"</div>
+          <p class="friendly-note">If the repo is private, they'll need to run "gh auth login" first (one time).</p>
+        </div>
+      </div>
+
+      <div class="share-step">
+        <div class="share-step-side">
+          <div class="share-step-num">4</div>
+          <div class="share-step-line"></div>
+        </div>
+        <div class="share-step-content">
+          <h3>Unzip and move to Documents</h3>
+          <p>Double-click the zip to extract it, then move the folder:</p>
+          <div class="share-cmd">mv ~/Downloads/cw-node-helper ~/Documents/cw-node-helper</div>
+          <p>Then go into the folder:</p>
+          <div class="share-cmd">cd ~/Documents/cw-node-helper</div>
+        </div>
+      </div>
+
+      <div class="share-step">
+        <div class="share-step-side">
+          <div class="share-step-num">5</div>
+          <div class="share-step-line"></div>
+        </div>
+        <div class="share-step-content">
+          <h3>Set up your API tokens</h3>
+          <p>Copy the example config and fill in your credentials:</p>
+          <div class="share-cmd">cp .env.example .env</div>
+          <p>Open the <code>.env</code> file in any text editor and paste your tokens. Follow <strong>ENV_GUIDE.txt</strong> for step-by-step instructions on getting each token.</p>
+          <p class="friendly-note">Your .env file stays private. It is never uploaded or shared.</p>
+        </div>
+      </div>
+
+      <div class="share-step">
+        <div class="share-step-side">
+          <div class="share-step-num">6</div>
+          <div class="share-step-line"></div>
+        </div>
+        <div class="share-step-content">
+          <h3>Run the app</h3>
+          <p>Load your credentials and start:</p>
+          <div class="share-cmd">source load_env.sh &amp;&amp; python3 get_node_context.py</div>
+          <p class="friendly-note">You'll see the main menu. Type a ticket number or pick an option. That's it!</p>
+        </div>
+      </div>
+
+      <div class="share-step">
+        <div class="share-step-side">
+          <div class="share-step-num">7</div>
+        </div>
+        <div class="share-step-content">
+          <h3>Updating later</h3>
+          <p>When a new version is released, download the new zip to your Downloads folder, then run:</p>
+          <div class="share-cmd">bash update.sh</div>
+          <p>This replaces the app files but <strong>keeps your .env and bookmarks</strong> safe. You're up to date in 5 seconds.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tip-box reveal" style="margin-top: 2rem; max-width: 700px;">
+      <strong>Quick share message for Slack:</strong> "Hey! Download cw-node-helper.zip from the Releases page, unzip it, run <code>pip3 install requests</code>, copy .env.example to .env, add your Jira token, then run <code>source load_env.sh && python3 get_node_context.py</code>. That's it."
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  PROJECT ARCHITECTURE                                            -->
+<!-- ================================================================ -->
+<section id="arch" class="section" style="background: var(--bg-raised);">
+  <div class="wrap">
+    <div class="section-label">Project Architecture</div>
+    <h2>What each file does</h2>
+    <p class="section-desc">The full project structure, color-coded by purpose.</p>
+
+    <div class="file-tree reveal">cw-node-helper/
+<span class="comment">&#x2502;</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file-main">get_node_context.py</span>     <span class="comment">&#x2190; the entire app (7,169 lines)</span>
+<span class="comment">&#x2502;</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file-ci">.github/workflows/</span>
+<span class="comment">&#x2502;   &#x251C;&#x2500;&#x2500;</span> <span class="file-ci">ci.yml</span>                <span class="comment">&#x2190; test on every push (3 Python versions)</span>
+<span class="comment">&#x2502;   &#x2514;&#x2500;&#x2500;</span> <span class="file-ci">release.yml</span>           <span class="comment">&#x2190; build + publish on version tags</span>
+<span class="comment">&#x2502;</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file-data">ib_topology.json</span>          <span class="comment">&#x2190; pre-generated IB port mappings</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file-data">dh_layouts.json</span>           <span class="comment">&#x2190; data hall rack layouts (auto-created)</span>
+<span class="comment">&#x2502;</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file">pyproject.toml</span>             <span class="comment">&#x2190; package config (pip install -e .)</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file">requirements.txt</span>          <span class="comment">&#x2190; just "requests>=2.28.0"</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file">.env.example</span>              <span class="comment">&#x2190; credential template for new users</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file">.gitignore</span>                <span class="comment">&#x2190; keeps .env + source/ out of git</span>
+<span class="comment">&#x2502;</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file">load_env.sh</span>               <span class="comment">&#x2190; sources .env into shell</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file">update.sh</span>                 <span class="comment">&#x2190; self-updater (preserves .env)</span>
+<span class="comment">&#x2502;</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file-main">test_integrity.py</span>         <span class="comment">&#x2190; 94 unit tests</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file">test_map.py</span>               <span class="comment">&#x2190; rack math tests</span>
+<span class="comment">&#x2502;</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file-doc">docs/</span>                     <span class="comment">&#x2190; dev guides, build logs, roadmap</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="file-doc">site/</span>                     <span class="comment">&#x2190; visual documentation (this page!)</span>
+<span class="comment">&#x2502;</span>
+<span class="comment">&#x251C;&#x2500;&#x2500;</span> <span class="t-red">source/</span>                   <span class="comment">&#x2190; Excel cutsheets (15MB, NOT in git)</span>
+<span class="comment">&#x2514;&#x2500;&#x2500;</span> <span class="t-red">.env</span>                      <span class="comment">&#x2190; your API tokens (NOT in git)</span></div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  MIGRATION                                                       -->
+<!-- ================================================================ -->
+<section id="migrate" class="section">
+  <div class="wrap">
+    <div class="section-label">Future Migration</div>
+    <h2>When your own repo is approved</h2>
+    <p class="section-desc">Currently hosted as a branch on <strong>coreweave/TopoWeave</strong>. When the dedicated <strong>coreweave/cw-node-helper</strong> repo is approved, migrate in 3 commands.</p>
+
+    <div class="migrate-commands reveal" style="max-width: 700px;">
+      <div class="migrate-cmd">
+        <div class="migrate-num">1</div>
+        <div>
+          <p>Point to the new repo</p>
+          <code>git remote set-url origin git@github.com:coreweave/cw-node-helper.git</code>
+        </div>
+      </div>
+
+      <div class="migrate-cmd">
+        <div class="migrate-num">2</div>
+        <div>
+          <p>Rename branch to main</p>
+          <code>git branch -M main</code>
+        </div>
+      </div>
+
+      <div class="migrate-cmd">
+        <div class="migrate-num">3</div>
+        <div>
+          <p>Push everything &mdash; code, history, and all version tags</p>
+          <code>git push -u origin main --tags</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-box reveal" style="margin-top: 1.5rem; max-width: 700px;">
+      <strong>CI/CD carries over.</strong> The workflow files are already in the repo. Just update <code>ci.yml</code> to trigger on <code>main</code> instead of <code>rpatino/cw-node-helper</code> and you're done.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!--  FOOTER                                                          -->
+<!-- ================================================================ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-left">
+      <strong>cw-node-helper</strong> CI/CD Guide &mdash; built by Raoko
+    </div>
+    <div class="footer-right">
+      Branch: rpatino/cw-node-helper @ coreweave/TopoWeave
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================ -->
+<!--  SCRIPTS                                                         -->
+<!-- ================================================================ -->
+<script>
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// Scroll-reveal observer
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
